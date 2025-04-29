@@ -16,6 +16,7 @@ public:
         lvl[11][1] = 'w';
         lvl[11][2] = 'w';
         lvl[11][3] = 'w';
+        lvl[9][3] = 'w';
 
         wallTex1.loadFromFile("Data/brick1.png");
         wallSprite1.setTexture(wallTex1);
