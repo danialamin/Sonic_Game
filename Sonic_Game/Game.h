@@ -1,14 +1,14 @@
 #pragma once
 #include "Global_variables.h"
 #include "Level.h"
-#include "Player.h"
+#include "PlayerFactory.h"
 
 class Game {
 private:
     RenderWindow window;
     Event event;
     Level level;
-    Player player;
+    PlayerFactory player;
     Music lvlMus;
 public:
     Game() : window(VideoMode(screen_x, screen_y), "Sonic the Hedgehog-OOP", Style::Close) {

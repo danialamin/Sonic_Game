@@ -1,6 +1,8 @@
 #pragma once
+#include "Global_variables.h"
+#include "Level.h"
 
-class Player {
+class PlayerFactory { // abstract class
 private:
     float player_x, player_y;
     float velocityY;
@@ -12,7 +14,7 @@ private:
     int hit_box_factor_x, hit_box_factor_y;
     int Pwidth, Pheight;
 public:
-    Player() {
+    PlayerFactory() {
         player_x = 100;
         player_y = 100;
         velocityY = 0;

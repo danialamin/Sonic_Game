@@ -5,16 +5,16 @@ C:\Users\Danial\OneDrive\Windows Desktop\Sonic_Game\Sonic_Game\Level.h(39,62): w
 C:\Users\Danial\OneDrive\Windows Desktop\Sonic_Game\Sonic_Game\Level.h(39,47): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
   (compiling source file 'Source.cpp')
   
-C:\Users\Danial\OneDrive\Windows Desktop\Sonic_Game\Sonic_Game\Player.h(27,28): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+C:\Users\Danial\OneDrive\Windows Desktop\Sonic_Game\Sonic_Game\PlayerFactory.h(27,28): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
   (compiling source file 'Source.cpp')
   
-C:\Users\Danial\OneDrive\Windows Desktop\Sonic_Game\Sonic_Game\Player.h(28,29): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+C:\Users\Danial\OneDrive\Windows Desktop\Sonic_Game\Sonic_Game\PlayerFactory.h(28,29): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
   (compiling source file 'Source.cpp')
   
-C:\Users\Danial\OneDrive\Windows Desktop\Sonic_Game\Sonic_Game\Player.h(29,30): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+C:\Users\Danial\OneDrive\Windows Desktop\Sonic_Game\Sonic_Game\PlayerFactory.h(29,30): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
   (compiling source file 'Source.cpp')
   
-C:\Users\Danial\OneDrive\Windows Desktop\Sonic_Game\Sonic_Game\Player.h(30,30): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+C:\Users\Danial\OneDrive\Windows Desktop\Sonic_Game\Sonic_Game\PlayerFactory.h(30,30): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
   (compiling source file 'Source.cpp')
   
   Sonic_Game.vcxproj -> C:\Users\Danial\OneDrive\Windows Desktop\Sonic_Game\Sonic_Game\x64\Debug\Sonic_Game.exe

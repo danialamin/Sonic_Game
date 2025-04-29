@@ -1,7 +1,7 @@
 #pragma once
 #include "Global_variables.h"
 
-class Level {
+class Level { // abstract class
 private:
     char** lvl;
     Texture wallTex1;

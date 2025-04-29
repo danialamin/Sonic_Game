@@ -139,7 +139,10 @@
     <ClInclude Include="Game.h" />
     <ClInclude Include="Global_variables.h" />
     <ClInclude Include="Level.h" />
-    <ClInclude Include="Player.h" />
+    <ClInclude Include="PlayerFactory.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include=".gitignore" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
