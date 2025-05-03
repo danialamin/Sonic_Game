@@ -133,13 +133,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Player.cpp" />
     <ClCompile Include="Source.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Global_variables.h" />
     <ClInclude Include="Level.h" />
+    <ClInclude Include="Player.h" />
     <ClInclude Include="PlayerFactory.h" />
+    <ClInclude Include="Sonic.h" />
+    <ClInclude Include="SonicFactory.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />

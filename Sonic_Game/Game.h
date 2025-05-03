@@ -2,16 +2,17 @@
 #include "Global_variables.h"
 #include "Level.h"
 #include "PlayerFactory.h"
+#include "Camera.h"
 
 class Game {
 private:
     RenderWindow window;
     Event event;
-    Level level;
-    PlayerFactory player;
+    Level* level;
+    Camera camera;
     Music lvlMus;
 public:
-    Game() : window(VideoMode(screen_x, screen_y), "Sonic the Hedgehog-OOP", Style::Close) {
+    Game() : window(VideoMode(screen_x, screen_y), "Sonic the Hedgehog-OOP", Style::Close), level(new Level()), camera(800, 600) {
         window.setVerticalSyncEnabled(true);
         window.setFramerateLimit(60);
 
@@ -29,6 +30,11 @@ public:
         }
     }
 
+    // destructor
+    ~Game() {
+        delete level;
+    }
+
 private:
     void handleEvents() {
         while (window.pollEvent(event)) {
@@ -41,14 +47,16 @@ private:
     }
 
     void update() {
-        player.handleInput();
-        player.applyGravity(level);
+        level->getSonic()->handleInput();
+        level->getSonic()->checkCollisions(level);
+        level->getSonic()->applyGravity(level);
+        camera.update(level->getSonic()->getX(), level->getSonic()->getY());
     }
 
     void render() {
         window.clear();
-        level.draw(window);
-        player.draw(window);
+        level->draw(window, camera);
+        level->getSonic()->draw(window, camera);
         window.display();
     }
 };

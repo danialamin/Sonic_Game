@@ -11,4 +11,4 @@ const int screen_x = 1200;
 const int screen_y = 900;
 const int cell_size = 64;
 const int height = 14;
-const int width = 110;
+const int width = 200;
