@@ -78,6 +78,10 @@ public:
         return player_y;
     }
 
+    bool getJump() {
+        return inAJump;
+    }
+
     // manageRun function applies acceleration, makes the player run if right/left keys are pressed
     void manageRun(bool isMoving, int direction) {
         // Handle running with acceleration

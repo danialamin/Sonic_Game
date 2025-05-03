@@ -1,0 +1,270 @@
+#pragma once
+#include "Global_variables.h"
+#include "PlayerFactory.h"
+#include "Player.h"
+class Enemy {
+protected:
+	float x, y;
+	int health;
+	Sprite sprite;
+	Texture texture;
+
+public:
+	Enemy(float x, float y, int health) : x(x), y(y), health(health) {}
+	virtual void move(Player* p) = 0;
+	virtual void attackHero(Player* p) {
+		if (p->getX() == x && p->getY() == y) {
+			if (p->getJump()) {
+				//gets attacked
+				health -= 2;//need to determine later on (AHMED NOTE)
+				// make take damage function (AHMED NOTE)
+				//will function called in parent class do dynamic polymorphism??? (REMINDER TO ASK SIR SHEHRYAR)
+
+			}
+			else {
+				//will attack
+				//player taking damage function will be implemented here (AHMED NOTE)
+			}
+
+		}
+
+	}
+	virtual void draw(RenderWindow& window) {
+		sprite.setPosition(x, y);
+		window.draw(sprite);
+	}
+
+	//IMPORTANT MUST IMPLEMENT DESTRUCTORS FOR ALL CLASSES (AHMED NOTE)
+
+
+};
+
+
+
+
+
+
+
+
+//need to put this in seperate file (AHMED NOTE)
+class BatBrain : public Enemy {
+public:
+	BatBrain() : Enemy(0, 0, 3) { // need to add parameters for later work(AHMED NOTE)
+		texture.loadFromFile("Data/brick1.png");//temporary filler(AHMED NOTE)
+		sprite.setTexture(texture);
+	}
+	void move(Player* p) {
+		if (p->getX() > x)
+			x += 1; //need to determine speed later on(AHMED NOTE)
+		else
+			x -= 1;
+
+		if (p->getY() > y)
+			y += 1;
+		else
+			y -= 1;
+	}
+
+
+};
+
+class BeeBot : public Enemy {
+
+private:
+	//projectile class and function to be implemented later (AHMED NOTE)
+	Clock xClock;
+	Clock yClock;
+	bool yUp = true, xRight = true;
+public:
+	BeeBot() : Enemy(32, 0, 5) { // need to add parameters for later work(AHMED NOTE)
+
+		texture.loadFromFile("Data/brick1.png");//temporary filler(AHMED NOTE)
+		sprite.setTexture(texture);
+	}
+	void move(Player* p) {
+
+		if (yUp)
+			y += 1;
+		else
+			y -= 1;
+		if (yClock.getElapsedTime().asSeconds() > 1.5) { yUp = !yUp; yClock.restart(); }
+
+		if (xRight)
+			x += 1;
+		else
+			x -= 1;
+		if (xClock.getElapsedTime().asSeconds() > 4) { xRight = !xRight; xClock.restart(); }
+	}
+
+
+};
+
+
+class MotoBug :public Enemy {
+public:
+	MotoBug() : Enemy(32, 56, 2) { // need to add parameters for later work(AHMED NOTE)
+		texture.loadFromFile("Data/brick1.png");//temporary filler(AHMED NOTE)
+		sprite.setTexture(texture);
+	}
+
+	void move(Player* p) {
+		if (p->getX() > x)
+			x += 1; //need to determine speed later on(AHMED NOTE)
+		else
+			x -= 1;
+
+		if (p->getY() > y)
+			y += 1;
+		else
+			y -= 1;
+	}
+
+};
+
+class CrabMeat :public Enemy {
+private:
+	//projectile class and function to be implemented later (AHMED NOTE)
+
+	Clock xClock;
+	bool xRight = true;
+public:
+	CrabMeat() : Enemy(32, 0, 4) { // need to add parameters for later work(AHMED NOTE)
+		texture.loadFromFile("Data/brick1.png");//temporary filler(AHMED NOTE)
+		sprite.setTexture(texture);
+	}
+	void move(Player* p) {
+
+
+		if (xRight)
+			x += 1;
+		else
+			x -= 1;
+		if (xClock.getElapsedTime().asSeconds() > 4) { xRight = !xRight; xClock.restart(); }
+
+	}
+};
+
+class EggStinger : public Enemy {
+private:
+	int hitsLeft;
+	Clock xClock, hitClock;
+	bool xRight = true;
+	bool isHiting = false;
+
+public:
+	EggStinger() : Enemy(32, 0, 0), hitsLeft(15) { // need to add parameters for later work(AHMED NOTE)
+		texture.loadFromFile("Data/brick1.png");//temporary filler(AHMED NOTE)
+		sprite.setTexture(texture);
+	}
+
+	void move(Player* p) {
+
+		if (hitClock.getElapsedTime().asSeconds() >= 10)
+		{
+			hitPlayer(p);
+		}
+		else {
+			if (xRight)
+				x += 1;
+			else
+				x -= 1;
+			if (xClock.getElapsedTime().asSeconds() > 4) { xRight = !xRight; xClock.restart(); }
+			//NEED TO COMPLETE LOGIC (AHMED NOTE)
+		}
+	}
+
+	void hitPlayer(Player* p) {
+
+	}
+
+	void destroyBlock() {}
+
+	virtual void attackHero(Player* p) {
+		if (p->getX() == x && p->getY() == y) {
+			if (p->getJump()) {
+				//gets attacked
+				hitsLeft--;
+				// make take damage function (AHMED NOTE)
+				//will function called in parent class do dynamic polymorphism??? (REMINDER TO ASK SIR SHEHRYAR)
+
+			}
+			else {
+				//will attack
+				//player taking damage function will be implemented here (AHMED NOTE)
+			}
+
+		}
+
+	}
+
+
+};
+
+
+
+
+
+
+
+class EnemyFactory {
+public:
+	Enemy* createEnemy(string& type, float x = 0.0f, float y = 0.0f) {
+		if (type == "BatBrain") {
+			return new BatBrain(); // pass coordinates later on (AHMED NOTE)
+		}
+		else if (type == "BeeBot") {
+			return new BeeBot();
+		}
+		else if (type == "MotoBug") {
+			return new MotoBug();
+		}
+		else if (type == "CrabMeat") {
+			return new CrabMeat();
+		}
+		else if (type == "EggStinger") {
+			return new EggStinger();
+		}
+		else {
+			return nullptr;
+		}
+	}
+};
+
+
+class Projectile {
+private:
+	float x, y, targetX, targetY;
+	Sprite sprite;
+	Texture texture;
+public:
+	Projectile(float x, float y, float targetX, float targetY) : x(x), y(y), targetX(targetX), targetY(targetY) {
+		//texture.loadFromFile();//NEED PLACE HOLDER (AHMED NOTE)
+		//sprite.setTexture(texture);
+	}
+
+	void move(Player* p) {
+		if (targetX > x)
+			x += 1; //need to determine speed later on(AHMED NOTE)
+		else
+			x -= 1;
+
+		if (targetY > y)
+			y += 1;
+		else
+			y -= 1;
+	}
+
+	virtual void attackHero(Player* p) {
+		if (p->getX() == x && p->getY() == y) {
+			if (!p->getJump()) {
+				//attacks player
+
+				// make take damage function (AHMED NOTE)
+
+
+			}
+
+		}
+
+	}
+};
