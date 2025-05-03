@@ -1,34 +1,32 @@
-# Visual Studio build files
+# Ignore build output
+[Bb]in/
+[Dd]ebug/
+[Rr]elease/
+x64/
+build/
+
+# Ignore compiled files
 *.obj
 *.exe
-*.pdb
 *.ilk
-*.aps
-*.ncb
-*.sdf
-*.opensdf
-*.cache
 *.log
-
-# Build folders
-[Bb]in/
-[Oo]bj/
-
-# User-specific files
-*.user
+*.pdb
+*.idb
 *.suo
-*.userosscache
-*.sln.docstates
+*.user
+*.cache
+*.tlog
 
-# CMake
-CMakeFiles/
-CMakeCache.txt
-cmake_install.cmake
-Makefile
-
-# Other
-.vscode/
-.ipch/
-*.tlog/
+# Ignore Visual Studio files
+*.vcxproj.user
 *.VC.db
+*.opensdf
+*.sdf
+
+# Ignore temporary files
+*.tmp
+*.bak
+*.ncb
+
+# Ignore .vs folder (Visual Studio's cache/settings)
 .vs/
