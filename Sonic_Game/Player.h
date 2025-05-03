@@ -14,7 +14,9 @@ protected:
     float accelerationX;     // Acceleration rate
     bool runningRight;       // Track running direction
     bool runningLeft;        // Track running direction
+    bool isInvincible; //if the player is invincible
     Clock runClock;      // Clock to track acceleration time
+    Clock invincibleClock; //clock for howlong a player is invincible
     float accelerationTime;// For how long the player has been accelerating
     bool wasRightKeyHeld;         // Track if the right key was held previously
     bool wasLeftKeyHeld;         // Track if the left key was held previously
@@ -24,6 +26,7 @@ protected:
     bool onGround;
     float gravity;
     float terminal_Velocity;
+    int health; //TEMPORARY ADD
     Sprite sprite;
     Texture textureRight;
     Texture textureLeft;
@@ -80,6 +83,21 @@ public:
 
     bool getJump() {
         return inAJump;
+    }
+
+    void takeDamage() { //when player takes damage from enemies
+        if (isInvincible){}
+        else {
+            health--;
+            isInvincible = true;
+            invincibleClock.restart();
+        }
+    }
+
+    void checkInvincibility(){ //this is to check for invincibility
+        if (!isInvincible) { return; }
+
+        if (invincibleClock.getElapsedTime().asSeconds() >= 1) { isInvincible = false; }
     }
 
     // manageRun function applies acceleration, makes the player run if right/left keys are pressed

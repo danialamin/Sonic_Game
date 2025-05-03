@@ -50,6 +50,7 @@ private:
         level->getSonic()->handleInput();
         level->getSonic()->checkCollisions(level);
         level->getSonic()->applyGravity(level);
+        level->getSonic()->checkInvincibility();
         camera.update(level->getSonic()->getX(), level->getSonic()->getY());
     }
 

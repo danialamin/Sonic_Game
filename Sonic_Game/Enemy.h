@@ -22,8 +22,7 @@ public:
 
 			}
 			else {
-				//will attack
-				//player taking damage function will be implemented here (AHMED NOTE)
+				p->takeDamage();
 			}
 
 		}
@@ -71,10 +70,12 @@ public:
 class BeeBot : public Enemy {
 
 private:
-	//projectile class and function to be implemented later (AHMED NOTE)
+	Projectile** projectile = new Projectile * [10];
+	Clock projectileClock;
 	Clock xClock;
 	Clock yClock;
 	bool yUp = true, xRight = true;
+
 public:
 	BeeBot() : Enemy(32, 0, 5) { // need to add parameters for later work(AHMED NOTE)
 
@@ -94,6 +95,25 @@ public:
 		else
 			x -= 1;
 		if (xClock.getElapsedTime().asSeconds() > 4) { xRight = !xRight; xClock.restart(); }
+	}
+
+	void shootProjectile(Player* p) {
+		if (projectileClock.getElapsedTime().asSeconds() >= 5) {
+			int findProjectile = 0;
+			while(projectile[findProjectile++] != NULL){}
+			projectile[findProjectile] = new Projectile(x, y, p->getX(), p->getY());
+			projectileClock.restart();
+		}
+	}
+	void destroyProjectile() {
+		for (int i = 0; i < 10; i++)
+		{
+			if (projectile[i]->getDestroy()) {
+				delete projectile[i];
+				projectile[i] = NULL;
+			}
+
+		}
 	}
 
 
@@ -123,8 +143,8 @@ public:
 
 class CrabMeat :public Enemy {
 private:
-	//projectile class and function to be implemented later (AHMED NOTE)
-
+	Projectile** projectile = new Projectile * [10];
+	Clock projectileClock;
 	Clock xClock;
 	bool xRight = true;
 public:
@@ -141,6 +161,25 @@ public:
 			x -= 1;
 		if (xClock.getElapsedTime().asSeconds() > 4) { xRight = !xRight; xClock.restart(); }
 
+	}
+	void shootProjectile(Player* p) {
+		if (projectileClock.getElapsedTime().asSeconds() >= 5) {
+			int findProjectile = 0;
+			while (projectile[findProjectile++] != NULL) {}
+			projectile[findProjectile] = new Projectile(x, y, p->getX(), p->getY());
+			projectileClock.restart();
+		}
+	}
+
+	void destroyProjectile() {
+		for (int i = 0; i < 10; i++)
+		{
+			if (projectile[i]->getDestroy()) {
+				delete projectile[i];
+				projectile[i] = NULL;
+			}
+				
+		}
 	}
 };
 
@@ -174,7 +213,7 @@ public:
 	}
 
 	void hitPlayer(Player* p) {
-
+	
 	}
 
 	void destroyBlock() {}
@@ -189,8 +228,7 @@ public:
 
 			}
 			else {
-				//will attack
-				//player taking damage function will be implemented here (AHMED NOTE)
+				p->takeDamage();
 			}
 
 		}
@@ -236,11 +274,14 @@ private:
 	float x, y, targetX, targetY;
 	Sprite sprite;
 	Texture texture;
+	bool destroy = false;
 public:
 	Projectile(float x, float y, float targetX, float targetY) : x(x), y(y), targetX(targetX), targetY(targetY) {
 		//texture.loadFromFile();//NEED PLACE HOLDER (AHMED NOTE)
 		//sprite.setTexture(texture);
 	}
+
+	bool getDestroy() { return destroy; }
 
 	void move(Player* p) {
 		if (targetX > x)
@@ -252,19 +293,19 @@ public:
 			y += 1;
 		else
 			y -= 1;
+
+		if (y = 0) { destroy = true; }
 	}
 
 	virtual void attackHero(Player* p) {
 		if (p->getX() == x && p->getY() == y) {
 			if (!p->getJump()) {
-				//attacks player
-
-				// make take damage function (AHMED NOTE)
-
-
+				p->takeDamage();
 			}
-
 		}
-
+	}
+	virtual void draw(RenderWindow& window) {
+		sprite.setPosition(x, y);
+		window.draw(sprite);
 	}
 };
