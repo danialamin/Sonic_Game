@@ -26,7 +26,7 @@ protected:
     bool onGround;
     float gravity;
     float terminal_Velocity;
-    int health; //TEMPORARY ADD
+    int health; //TEMPORARY ADDED (AHMED)
     Sprite sprite;
     Texture textureRight;
     Texture textureLeft;

@@ -48,7 +48,7 @@ public:
 //need to put this in seperate file (AHMED NOTE)
 class BatBrain : public Enemy {
 public:
-	BatBrain() : Enemy(0, 0, 3) { // need to add parameters for later work(AHMED NOTE)
+	BatBrain(float x, float y) : Enemy(x, y, 3) { // need to add parameters for later work(AHMED NOTE)
 		texture.loadFromFile("Data/brick1.png");//temporary filler(AHMED NOTE)
 		sprite.setTexture(texture);
 	}
@@ -77,7 +77,7 @@ private:
 	bool yUp = true, xRight = true;
 
 public:
-	BeeBot() : Enemy(32, 0, 5) { // need to add parameters for later work(AHMED NOTE)
+	BeeBot(float x, float y) : Enemy(x, y, 5) { // need to add parameters for later work(AHMED NOTE)
 
 		texture.loadFromFile("Data/brick1.png");//temporary filler(AHMED NOTE)
 		sprite.setTexture(texture);
@@ -100,7 +100,7 @@ public:
 	void shootProjectile(Player* p) {
 		if (projectileClock.getElapsedTime().asSeconds() >= 5) {
 			int findProjectile = 0;
-			while(projectile[findProjectile++] != NULL){}
+			while (projectile[findProjectile++] != NULL) {}
 			projectile[findProjectile] = new Projectile(x, y, p->getX(), p->getY());
 			projectileClock.restart();
 		}
@@ -122,7 +122,7 @@ public:
 
 class MotoBug :public Enemy {
 public:
-	MotoBug() : Enemy(32, 56, 2) { // need to add parameters for later work(AHMED NOTE)
+	MotoBug(float x, float y) : Enemy(x, y, 2) { // need to add parameters for later work(AHMED NOTE)
 		texture.loadFromFile("Data/brick1.png");//temporary filler(AHMED NOTE)
 		sprite.setTexture(texture);
 	}
@@ -133,10 +133,7 @@ public:
 		else
 			x -= 1;
 
-		if (p->getY() > y)
-			y += 1;
-		else
-			y -= 1;
+	
 	}
 
 };
@@ -148,7 +145,7 @@ private:
 	Clock xClock;
 	bool xRight = true;
 public:
-	CrabMeat() : Enemy(32, 0, 4) { // need to add parameters for later work(AHMED NOTE)
+	CrabMeat(float x, float y) : Enemy(x, y, 4) { // need to add parameters for later work(AHMED NOTE)
 		texture.loadFromFile("Data/brick1.png");//temporary filler(AHMED NOTE)
 		sprite.setTexture(texture);
 	}
@@ -178,7 +175,7 @@ public:
 				delete projectile[i];
 				projectile[i] = NULL;
 			}
-				
+
 		}
 	}
 };
@@ -191,7 +188,7 @@ private:
 	bool isHiting = false;
 
 public:
-	EggStinger() : Enemy(32, 0, 0), hitsLeft(15) { // need to add parameters for later work(AHMED NOTE)
+	EggStinger(float x, float y) : Enemy(x, y, 0), hitsLeft(15) { // need to add parameters for later work(AHMED NOTE)
 		texture.loadFromFile("Data/brick1.png");//temporary filler(AHMED NOTE)
 		sprite.setTexture(texture);
 	}
@@ -213,7 +210,7 @@ public:
 	}
 
 	void hitPlayer(Player* p) {
-	
+
 	}
 
 	void destroyBlock() {}
@@ -294,7 +291,7 @@ public:
 		else
 			y -= 1;
 
-		if (y = 0) { destroy = true; }
+		if (y = 200) { destroy = true; }
 	}
 
 	virtual void attackHero(Player* p) {
