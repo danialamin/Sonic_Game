@@ -28,8 +28,13 @@ public:
 		}
 
 	}
-	virtual void draw(RenderWindow& window) {
-		sprite.setPosition(x, y);
+	virtual void draw(RenderWindow& window, Camera& camera) {
+		// Calculate screen position
+		float screenX = camera.worldToScreenX(x);
+		float screenY = camera.worldToScreenY(y);
+
+		// Set sprite position to screen coordinates
+		sprite.setPosition(screenX, screenY);
 		window.draw(sprite);
 	}
 

@@ -1,6 +1,16 @@
 #pragma once
 #include "Global_variables.h"
 #include "SonicFactory.h"
+#include "EnemyFactory.h"
+#include "BeeBotFactory.h"
+#include "BeeBot.h"
+#include "BatBrainFactory.h"
+#include "BatBrain.h"
+#include "CrabMeatFactory.h"
+#include "CrabMeat.h"
+#include "MotoBugFactory.h"
+#include "MotoBug.h"
+#include "Enemy.h"
 #include "Sonic.h"
 
 class Level { // abstract class
@@ -9,6 +19,7 @@ protected:
     char** lvl;
     Texture wallTex1;
     Sprite wallSprite1;
+    EnemyFactory** enemyFactoryArray;
 public:
     Level() {
         lvl = new char* [height];
@@ -30,6 +41,12 @@ public:
         playerFactoryArray = new PlayerFactory*[1]; // playerFactoryArray = new PlayerFactory*[3];
         playerFactoryArray[0] = new SonicFactory();
         playerFactoryArray[0]->createPlayer();
+        enemyFactoryArray = new EnemyFactory*[4];
+        enemyFactoryArray[0] = new BatBrainFactory();
+        enemyFactoryArray[1] = new MotoBugFactory();
+        enemyFactoryArray[2] = new BeeBotFactory();
+        enemyFactoryArray[3] = new CrabMeatFactory();
+
     }
 
     // getters
@@ -44,6 +61,12 @@ public:
     Player* getSonic() {
         return playerFactoryArray[0]->getPlayer();
     }
+
+    Enemy* getBatBrain() {return enemyFactoryArray[0]->getEnemy();}
+    Enemy* getMotoBug() { return enemyFactoryArray[1]->getEnemy(); }
+    Enemy* getBeeBot() { return enemyFactoryArray[2]->getEnemy(); }
+    Enemy* getCrabMeat() { return enemyFactoryArray[3]->getEnemy(); }
+
 
     void draw(RenderWindow& window, Camera& camera) {
         for (int i = 0; i < height; ++i) {

@@ -6,7 +6,7 @@
 
 class BeeBotFactory : public EnemyFactory {
 public:
-	void createEnemy(float x, float y) override {
+	virtual void createEnemy(float x, float y) override {
 		enemy = new BeeBot(x, y);
 	}
 };
