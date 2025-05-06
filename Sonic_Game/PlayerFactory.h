@@ -9,7 +9,7 @@ protected:
 
 public:
 	// pure virtual function
-	virtual void createPlayer() = 0;
+	virtual void createPlayer(int activeOrPassive) = 0;
 
 	// getters
 	Player* getPlayer() {

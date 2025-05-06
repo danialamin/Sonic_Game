@@ -1,6 +1,5 @@
 #pragma once
 #include "Global_variables.h"
-
 using namespace std;
 using namespace sf;
 
@@ -10,6 +9,7 @@ private:
     float offsetY;
     float screenWidth;
     float screenHeight;
+    float fixedY; // Added to store the fixed vertical position
 
 public:
     Camera(float width, float height) {
@@ -17,19 +17,27 @@ public:
         offsetY = 0.0f;
         screenWidth = width;
         screenHeight = height;
+        fixedY = 0.0f; // Initialize the fixed Y position
     }
 
     void update(float playerX, float playerY) {
-        // Calculate the camera position to center player
+        // Calculate the camera position, but only update X
         offsetX = playerX - (screenWidth / 2);
-        offsetY = playerY - (screenHeight / 2);
 
-        // Prevent camera from showing areas outside the level boundaries
+        // Set the Y offset only once (on first update)
+        if (fixedY == 0.0f) {
+            fixedY = playerY - (screenHeight / 2);
+            offsetY = fixedY;
+        }
+
+        // Keep using the fixed Y value for camera position
+        // offsetY remains unchanged after initial setup
+
+        // Prevent camera from showing areas outside the level boundaries for X
         if (offsetX < 0) offsetX = 0;
+
+        // Y boundary check still applies to the fixed position
         if (offsetY < 0) offsetY = 0;
-        // Optional: Add max bounds if needed
-        // if (offsetX > maxLevelWidth - screenWidth) offsetX = maxLevelWidth - screenWidth;
-        // if (offsetY > maxLevelHeight - screenHeight) offsetY = maxLevelHeight - screenHeight;
     }
 
     float worldToScreenX(float worldX) {

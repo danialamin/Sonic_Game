@@ -2,11 +2,11 @@
 #include <iostream>
 #include "Global_variables.h"
 #include "PlayerFactory.h"
-#include "Sonic.h"
+#include "Knuckles.h"
 
-class SonicFactory : public PlayerFactory {
+class KnucklesFactory : public PlayerFactory {
 public:
 	void createPlayer(int activeOrPassive) override {
-		player = new Sonic(activeOrPassive);
+		player = new Knuckles(activeOrPassive);
 	}
 };

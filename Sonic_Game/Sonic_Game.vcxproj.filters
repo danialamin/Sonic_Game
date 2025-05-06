@@ -47,6 +47,18 @@
     <ClInclude Include="Camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Tails.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Knuckles.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TailsFactory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="KnucklesFactory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />

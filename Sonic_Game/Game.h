@@ -52,12 +52,35 @@ private:
         level->getSonic()->applyGravity(level);
         level->getSonic()->checkInvincibility();
         camera.update(level->getSonic()->getX(), level->getSonic()->getY());
+
+        level->getTails()->handleInput();
+        level->getTails()->checkCollisions(level);
+        level->getTails()->applyGravity(level);
+
+        level->getKnuckles()->handleInput();
+        level->getKnuckles()->checkCollisions(level);
+        level->getKnuckles()->applyGravity(level);
+
+        // put camera on the player who is active
+        if (level->getSonic()->getIsActive() == 1) {
+            camera.update(level->getSonic()->getX(), level->getSonic()->getY());
+        } else if (level->getTails()->getIsActive() == 1) {
+            camera.update(level->getTails()->getX(), level->getTails()->getY());
+        }
+        else {
+            camera.update(level->getKnuckles()->getX(), level->getKnuckles()->getY());
+        }
+
+		// shares the coordinates of the active player with the passive players
+        level->activePlayerCoordinatesSharing();
     }
 
     void render() {
         window.clear();
         level->draw(window, camera);
         level->getSonic()->draw(window, camera);
+        level->getTails()->draw(window, camera);
+        level->getKnuckles()->draw(window, camera);
         window.display();
     }
 };

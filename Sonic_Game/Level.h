@@ -11,7 +11,11 @@
 #include "MotoBugFactory.h"
 #include "MotoBug.h"
 #include "Enemy.h"
+#include "TailsFactory.h"
+#include "KnucklesFactory.h"
 #include "Sonic.h"
+#include "Tails.h"
+#include "Knuckles.h"
 
 class Level { // abstract class
 protected:
@@ -20,6 +24,7 @@ protected:
     Texture wallTex1;
     Sprite wallSprite1;
     EnemyFactory** enemyFactoryArray;
+    bool activePlayerJustJumped = false;
 public:
     Level() {
         lvl = new char* [height];
@@ -33,21 +38,43 @@ public:
         for (int i = 4; i < 200; i++) {
             lvl[11][i] = 'w';
         }
-        lvl[9][3] = 'w';
+        lvl[7][3] = 'w';
+        lvl[9][5] = 'w';
 
         wallTex1.loadFromFile("Data/brick1.png");
         wallSprite1.setTexture(wallTex1);
 
-        playerFactoryArray = new PlayerFactory*[1]; // playerFactoryArray = new PlayerFactory*[3];
-        playerFactoryArray[0] = new SonicFactory();
-        playerFactoryArray[0]->createPlayer();
         enemyFactoryArray = new EnemyFactory*[4];
         enemyFactoryArray[0] = new BatBrainFactory();
         enemyFactoryArray[1] = new MotoBugFactory();
         enemyFactoryArray[2] = new BeeBotFactory();
         enemyFactoryArray[3] = new CrabMeatFactory();
 
+        playerFactoryArray = new PlayerFactory*[3];
+        playerFactoryArray[0] = new SonicFactory(); // 2: isPassive1
+        playerFactoryArray[1] = new TailsFactory(); // 1: isActive
+		playerFactoryArray[2] = new KnucklesFactory(); // 3: isPassive2
+
+        // calling create functions
+        playerFactoryArray[0]->createPlayer(2);
+        playerFactoryArray[1]->createPlayer(1);
+        playerFactoryArray[2]->createPlayer(3);
+
+        // toggle the following in a handleInput() function
+        playerFactoryArray[0]->getPlayer()->setIsActive(0);
+        playerFactoryArray[1]->getPlayer()->setIsActive(1);
+        playerFactoryArray[2]->getPlayer()->setIsActive(0);
+
+		playerFactoryArray[0]->getPlayer()->setIsPassive1(1);
+		playerFactoryArray[1]->getPlayer()->setIsPassive1(0);
+		playerFactoryArray[2]->getPlayer()->setIsPassive1(0);
+
+		playerFactoryArray[0]->getPlayer()->setIsPassive2(0);
+		playerFactoryArray[1]->getPlayer()->setIsPassive2(0);
+		playerFactoryArray[2]->getPlayer()->setIsPassive2(1);
     }
+
+    // handleInput() to switch isActive attribute when 'S' is presses
 
     // getters
     char getCell(int i, int j) {
@@ -67,6 +94,13 @@ public:
     Enemy* getBeeBot() { return enemyFactoryArray[2]->getEnemy(); }
     Enemy* getCrabMeat() { return enemyFactoryArray[3]->getEnemy(); }
 
+    Player* getTails() {
+        return playerFactoryArray[1]->getPlayer();
+    }
+
+    Player* getKnuckles() {
+        return playerFactoryArray[2]->getPlayer();
+    }
 
     void draw(RenderWindow& window, Camera& camera) {
         for (int i = 0; i < height; ++i) {
@@ -89,13 +123,26 @@ public:
         }
     }
 
+	// this function is called in the main loop and gives the coordinates of the active player to the passive players
+	void activePlayerCoordinatesSharing() {
+		for (int i = 0; i < 3; i++) {
+			if (playerFactoryArray[i]->getPlayer()->getIsActive() == 1) {
+				for (int j = 0; j < 3; j++) {
+					if (i != j) {
+						playerFactoryArray[j]->getPlayer()->setActivePlayerCoordinates(playerFactoryArray[i]->getPlayer()->getX(), playerFactoryArray[i]->getPlayer()->getY(), playerFactoryArray[i]->getPlayer()->getDirection(), playerFactoryArray[i]->getPlayer()->getMaxSpeedX());
+					}
+				}
+			}
+		}
+	}
+
     ~Level() {
         for (int i = 0; i < height; ++i) {
             delete[] lvl[i];
         }
         delete[] lvl;
 
-        for (int i = 0; i < 1; i++) { // for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 3; i++) {
             delete playerFactoryArray[i];
         }
 

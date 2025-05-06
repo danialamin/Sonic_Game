@@ -12,16 +12,21 @@ protected:
     float minSpeedX;         // Starting speed
     float maxSpeedX;         // Maximum running speed
     float accelerationX;     // Acceleration rate
-    bool runningRight;       // Track running direction
-    bool runningLeft;        // Track running direction
     bool isInvincible; //if the player is invincible
     Clock runClock;      // Clock to track acceleration time
     Clock invincibleClock; //clock for howlong a player is invincible
     float accelerationTime;// For how long the player has been accelerating
+    Clock decelerationClock; // Clock to track deceleration time
+    float decelerationTime;  // For how long the player has been decelerating
+	float decelerationTimeLimit; // Maximum time for deceleration
+    float startDecelerationSpeed; // Speed at which deceleration began
+    bool isDecelerating;     // Track if player is decelerating
+    int decelerationDirection; // Direction during deceleration (1 or -1)
     bool wasRightKeyHeld;         // Track if the right key was held previously
     bool wasLeftKeyHeld;         // Track if the left key was held previously
-    bool isMoving;   // Track if player is moving
-    bool collisionWithWall; // checks if there's a wall in front of the player
+    bool isHorizontalKeyPressed;   // TRACK IF RIGHT OR LEFT KEY IS PRESSED
+    bool collisionWithWallHorizontally; // checks if there's a wall in front of the player
+	bool collisionWithWallAbove; // checks if there's a wall above the player
     int direction; // direction is 1 if player facing right and -1 for left
     bool onGround;
     float gravity;
@@ -35,21 +40,44 @@ protected:
     float offset_y;
     bool inAJump; // checks if player is in air or groun
     float jumpForce; // the starting up velocity when up key is presses
+    bool isActive; // true if player is active, false if passive
+    bool isPassive1; // true if player is in the middle of the three players
+    bool isPassive2; // true if player is behind two players
+	int* activePlayerCoordinates; // [0] = x, [1] = y, [2] = direction, [3] = maxSpeedX
+	float desiredX; // desired x position of the player if it is passive
+	float desiredY; // desired y position of the player if it is passive
+	bool isABall; // tracks if player is in ball form or not
+    Texture ballTextureRight;
+    Texture ballTextureLeft;
 public:
-    Player(string textureRightPath, string textureLeftPath, int maxSpeedX_arg) { // attributes whose values are different per child, will be passed as parameter
+    Player(string textureRightPath, string textureLeftPath, int maxSpeedX_arg, string ballTextureRight_arg, string ballTextureLeft_arg, int activeOrPassive) { // attributes whose values are different per child, will be passed as parameter
+		activePlayerCoordinates = new int[4]; // [0] = x, [1] = y, [2] = direction, [3] = maxSpeedX
+
         maxSpeedX = maxSpeedX_arg;
         velocityX = 0;
         accelerationX = 0;
-        minSpeedX = 2.0f;
+        minSpeedX = 2.5f;
         accelerationTime = 0.0f;
-        runningRight = false;
-        runningLeft = false;
+        decelerationTime = 0.0f;
+        startDecelerationSpeed = 0.0f;
+        isDecelerating = false;
         direction = 1;
-        collisionWithWall = false;
-        isMoving = false;
+        decelerationDirection = 1;
+        collisionWithWallHorizontally = false;
+        isHorizontalKeyPressed = false;
 
-        player_x = 100;
-        player_y = 100;
+        if (activeOrPassive==1) {
+            player_x = 100;
+            player_y = 0;
+        }
+        else if (activeOrPassive==2) {
+            player_x = 60;
+            player_y = 0;
+		}
+		else if (activeOrPassive == 3) {
+			player_x = 20;
+			player_y = 0;
+		}
         velocityY = 0;
         onGround = false;
         gravity = 1;
@@ -65,8 +93,11 @@ public:
         
         textureRight.loadFromFile(textureRightPath);
         textureLeft.loadFromFile(textureLeftPath);
-        sprite.setTexture(textureRight);
         sprite.setScale(scale_x, scale_y);
+
+        isABall = false;
+		ballTextureRight.loadFromFile(ballTextureRight_arg);
+		ballTextureLeft.loadFromFile(ballTextureLeft_arg);
         
         inAJump = false;
         jumpForce = -20.0f; // negative is up
@@ -100,23 +131,71 @@ public:
         if (invincibleClock.getElapsedTime().asSeconds() >= 1) { isInvincible = false; }
     }
 
+    bool getIsActive() {
+        return isActive;
+    }
+
+    bool getIsPassive1() {
+        return isPassive1;
+    }
+
+    bool getIsPassive2() {
+		return isPassive2;
+    }
+
+	int getDirection() {
+		return direction;
+	}
+
+	float getMaxSpeedX() {
+		return maxSpeedX;
+	}
+
+    // setters
+    void setIsActive(bool arg) {
+        isActive = arg;
+    }
+
+	void setIsPassive1(bool arg) {
+		isPassive1 = arg;
+    }
+
+	void setIsPassive2(bool arg) {
+		isPassive2 = arg;
+	}
+
+	void setActivePlayerCoordinates(int x_arg, int y_arg, int direction_arg, int maxSpeedX_arg) {
+		activePlayerCoordinates[0] = x_arg;
+		activePlayerCoordinates[1] = y_arg;
+		activePlayerCoordinates[2] = direction_arg;
+        activePlayerCoordinates[3] = maxSpeedX_arg;
+	}
+
     // manageRun function applies acceleration, makes the player run if right/left keys are pressed
-    void manageRun(bool isMoving, int direction) {
-        // Handle running with acceleration
-        if (isMoving && !collisionWithWall) {
+    void manageRun(bool isHorizontalKeyPressed, int direction) {
+        if (collisionWithWallHorizontally) { // if player is colliding with wall then stop moving
+			velocityX = 0;
+            isHorizontalKeyPressed = false;
+			isDecelerating = false;
+			accelerationTime = 0.0f;
+			runClock.restart();
+			return; // EXIT THE FUNCTION
+        }
+
+        if (isHorizontalKeyPressed) {
+            isDecelerating = false; // Reset deceleration state when starting to move
+
             if (!wasRightKeyHeld && direction == 1) { // if player was previously moving left and now want to move right so start acceleration from zero
                 accelerationTime = 0.0f;
                 runClock.restart();
                 wasRightKeyHeld = true;
                 wasLeftKeyHeld = false;
-                sprite.setTexture(textureRight);
             }
             else if (!wasLeftKeyHeld && direction == -1) { // if player was previously moving right and now want to move left so start acceleration from zero
                 accelerationTime = 0.0f;
                 runClock.restart();
                 wasLeftKeyHeld = true;
                 wasRightKeyHeld = false;
-                sprite.setTexture(textureLeft);
             }
 
             accelerationTime = runClock.getElapsedTime().asSeconds();
@@ -124,50 +203,122 @@ public:
             // Calculate the current speed based on acceleration time
             double currentSpeed = accelerationTime * accelerationTime; // currentSpeed is a quadratic curve: y=x^2
 
-            // Set velocity based on direction
-            if (currentSpeed>=maxSpeedX) {
-                velocityX = maxSpeedX * direction;
+            // Set the velocity
+            if (isActive) { // if active player then maximum speed it can go is its own maxSpeedX attribute
+                if (currentSpeed >= maxSpeedX) {
+                    velocityX = maxSpeedX * direction;
+                }
+                else {
+                    velocityX = currentSpeed * direction + (minSpeedX * direction);
+                }
             }
-            else {
-                velocityX = currentSpeed * direction + (minSpeedX * direction);
+            else { // if passive player then maximum speed it can go is the active player's maxSpeedX attribute
+                if (currentSpeed >= activePlayerCoordinates[3]) {
+                    velocityX = activePlayerCoordinates[3] * direction;
+                }
+                else {
+                    velocityX = currentSpeed * direction + (minSpeedX * direction);
+                }
             }
 
             // Apply velocity to position
             player_x += velocityX;
         }
-        else {
-            // No movement keys pressed, reset acceleration
-            accelerationTime = 0.0f;
-            velocityX = 0.0f;
-            wasRightKeyHeld = false;
-            wasLeftKeyHeld = false;
-            runClock.restart();
+        else { // right or left key not pressed
+			if (!isDecelerating && velocityX != 0) { // This is run only ONCE when the player stops moving
+                isDecelerating = true;
+                decelerationClock.restart();
+                decelerationTime = 0.0f;
+
+                // Store the starting speed for deceleration
+                if (velocityX > 0) {
+                    startDecelerationSpeed = velocityX;
+                    decelerationDirection = 1;
+                }
+                else {
+                    startDecelerationSpeed = -velocityX;
+                    decelerationDirection = -1;
+                }
+
+                decelerationTimeLimit = velocityX / 4; // decelerationTimeLimit is dependent on the speed at which the player started to decelerate
+				if (decelerationTimeLimit < 0) decelerationTimeLimit *= -1; // make it positive
+            }
+
+            // Apply deceleration if needed
+            if (isDecelerating) {
+                decelerationTime = decelerationClock.getElapsedTime().asSeconds();
+
+                if (decelerationTime >= decelerationTimeLimit) { // If we've finished decelerating
+                    velocityX = 0.0f;
+                    isDecelerating = false;
+                }
+				else { // if we are still decelerating
+                    float decelerationFactor = 1.0f - (decelerationTime / decelerationTimeLimit); // deceleration factor: 1.0 at start, 0.0 at end
+
+                    float currentSpeedDuringDeceleration = startDecelerationSpeed * decelerationFactor; // calculating current speed during deceleration using decelerationFactor
+
+                    // Apply direction
+                    velocityX = currentSpeedDuringDeceleration * decelerationDirection;
+                }
+
+                player_x += velocityX;
+            }
+
+            // Reset acceleration parameters if not moving
+            if (!isHorizontalKeyPressed && !isDecelerating) {
+                accelerationTime = 0.0f;
+                velocityX = 0.0f;
+                wasRightKeyHeld = false;
+                wasLeftKeyHeld = false;
+                runClock.restart();
+            }
         }
     }
 
     void checkCollisions(Level* level);
 
     void handleInput() {
-        // Check if movement keys are pressed
-        if (Keyboard::isKeyPressed(Keyboard::Right)) {
-            isMoving = true;
-            direction = 1;
-        }
-        else if (Keyboard::isKeyPressed(Keyboard::Left)) {
-            isMoving = true;
-            direction = -1;
-        }
-        else {
-            isMoving = false;
-        }
-
-
-        manageRun(isMoving, direction);
-
-        // call jump() if up key/space presses
+        // call jump() if up Space/Up presses
         if (Keyboard::isKeyPressed(Keyboard::Space) || Keyboard::isKeyPressed(Keyboard::Up)) {
             jump();
         }
+
+        bool keyRightPressed = Keyboard::isKeyPressed(Keyboard::Right);
+        bool keyLeftPressed = Keyboard::isKeyPressed(Keyboard::Left);
+        bool keyDownPressed = Keyboard::isKeyPressed(Keyboard::Down);
+
+        // Handle ball form transition
+        if (keyDownPressed && velocityX != 0) {
+            isABall = true;
+        }
+        // Reset ball form when velocity becomes zero and was previously in ball form
+        else if (isABall && velocityX == 0) {
+            isABall = false;
+        }
+
+        // Check if movement keys are pressed - but only allow movement if not in ball form
+        if (keyRightPressed && (!isABall||isABall && inAJump)) {
+            isHorizontalKeyPressed = true;
+            direction = 1;
+        }
+        else if (keyLeftPressed && (!isABall || isABall && inAJump)) {
+            isHorizontalKeyPressed = true;
+            direction = -1;
+        }
+        else {
+            isHorizontalKeyPressed = false;
+        }
+
+        // Check for instant stop when pressing opposite direction during deceleration
+        if (isDecelerating) {
+            if ((decelerationDirection == 1 && keyLeftPressed) || (decelerationDirection == -1 && keyRightPressed)) {
+                // Instant stop
+                velocityX = 0;
+                isDecelerating = false;
+            }
+        }
+
+        manageRun(isHorizontalKeyPressed, direction);
     }
 
     void jump() {
@@ -189,9 +340,30 @@ public:
 
         // Set sprite position to screen coordinates
         sprite.setPosition(screenX, screenY);
+
+		// Set the texture based on direction and ball form
+		if (isABall) {
+			if (direction == 1) {
+				sprite.setTexture(ballTextureRight);
+			}
+			else { 
+				sprite.setTexture(ballTextureLeft);
+			}
+        }
+        else {
+            if (direction == 1) {
+                sprite.setTexture(textureRight);
+            }
+            else {
+                sprite.setTexture(textureLeft);
+            }
+        }
+
         window.draw(sprite);
     }
 
     // destructor needs to be virtual so that the children destructors get called before
-    virtual ~Player() {}
+    virtual ~Player() {
+		delete activePlayerCoordinates;
+    }
 };
