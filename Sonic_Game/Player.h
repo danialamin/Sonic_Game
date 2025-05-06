@@ -43,7 +43,7 @@ protected:
     bool isActive; // true if player is active, false if passive
     bool isPassive1; // true if player is in the middle of the three players
     bool isPassive2; // true if player is behind two players
-	int* activePlayerCoordinates; // [0] = x, [1] = y, [2] = direction, [3] = maxSpeedX
+	int* activePlayerCoordinates; // [0] = x, [1] = y, [2] = direction, [3] = maxSpeedX, [4] = currentSpeedX
 	float desiredX; // desired x position of the player if it is passive
 	float desiredY; // desired y position of the player if it is passive
 	bool isABall; // tracks if player is in ball form or not
@@ -51,7 +51,7 @@ protected:
     Texture ballTextureLeft;
 public:
     Player(string textureRightPath, string textureLeftPath, int maxSpeedX_arg, string ballTextureRight_arg, string ballTextureLeft_arg, int activeOrPassive) { // attributes whose values are different per child, will be passed as parameter
-		activePlayerCoordinates = new int[4]; // [0] = x, [1] = y, [2] = direction, [3] = maxSpeedX
+		activePlayerCoordinates = new int[5]; // [0] = x, [1] = y, [2] = direction, [3] = maxSpeedX, [4] = currentSpeedX
 
         maxSpeedX = maxSpeedX_arg;
         velocityX = 0;
@@ -151,6 +151,10 @@ public:
 		return maxSpeedX;
 	}
 
+	float getCurrentSpeedX() {
+		return velocityX;
+	}
+
     // setters
     void setIsActive(bool arg) {
         isActive = arg;
@@ -164,11 +168,12 @@ public:
 		isPassive2 = arg;
 	}
 
-	void setActivePlayerCoordinates(int x_arg, int y_arg, int direction_arg, int maxSpeedX_arg) {
+	void setActivePlayerCoordinates(int x_arg, int y_arg, int direction_arg, int maxSpeedX_arg, float currentSpeedX_arg) {
 		activePlayerCoordinates[0] = x_arg;
 		activePlayerCoordinates[1] = y_arg;
 		activePlayerCoordinates[2] = direction_arg;
         activePlayerCoordinates[3] = maxSpeedX_arg;
+        activePlayerCoordinates[4] = currentSpeedX_arg;
 	}
 
     // manageRun function applies acceleration, makes the player run if right/left keys are pressed
@@ -296,14 +301,40 @@ public:
             isABall = false;
         }
 
-        // Check if movement keys are pressed - but only allow movement if not in ball form
+        // Check if movement keys are pressed - but only allow movement if not in ball form and not ahead of active player
         if (keyRightPressed && (!isABall||isABall && inAJump)) {
-            isHorizontalKeyPressed = true;
-            direction = 1;
+            if (isActive) {
+                isHorizontalKeyPressed = true;
+                direction = 1;
+            }
+            else if (isPassive1 && player_x<activePlayerCoordinates[0]-10) {
+                isHorizontalKeyPressed = true;
+                direction = 1;
+            }
+            else if (isPassive2 && player_x < activePlayerCoordinates[0] - 15) {
+                isHorizontalKeyPressed = true;
+                direction = 1;
+            }
+            else {
+				isHorizontalKeyPressed = false;
+            }
         }
         else if (keyLeftPressed && (!isABall || isABall && inAJump)) {
-            isHorizontalKeyPressed = true;
-            direction = -1;
+            if (isActive) {
+                isHorizontalKeyPressed = true;
+                direction = -1;
+            }
+            else if (isPassive1 && player_x > activePlayerCoordinates[0] + 10) {
+                isHorizontalKeyPressed = true;
+                direction = -1;
+            }
+            else if (isPassive2 && player_x > activePlayerCoordinates[0] + 15) {
+                isHorizontalKeyPressed = true;
+                direction = -1;
+            }
+            else {
+				isHorizontalKeyPressed = false;
+            }
         }
         else {
             isHorizontalKeyPressed = false;

@@ -47,6 +47,9 @@ private:
     }
 
     void update() {
+        // shares the coordinates of the active player with the passive players
+        level->activePlayerCoordinatesSharing();
+
         level->getSonic()->handleInput();
         level->getSonic()->checkCollisions(level);
         level->getSonic()->applyGravity(level);
@@ -70,9 +73,6 @@ private:
         else {
             camera.update(level->getKnuckles()->getX(), level->getKnuckles()->getY());
         }
-
-		// shares the coordinates of the active player with the passive players
-        level->activePlayerCoordinatesSharing();
     }
 
     void render() {

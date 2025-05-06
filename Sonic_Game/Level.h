@@ -24,7 +24,6 @@ protected:
     Texture wallTex1;
     Sprite wallSprite1;
     EnemyFactory** enemyFactoryArray;
-    bool activePlayerJustJumped = false;
 public:
     Level() {
         lvl = new char* [height];
@@ -129,7 +128,7 @@ public:
 			if (playerFactoryArray[i]->getPlayer()->getIsActive() == 1) {
 				for (int j = 0; j < 3; j++) {
 					if (i != j) {
-						playerFactoryArray[j]->getPlayer()->setActivePlayerCoordinates(playerFactoryArray[i]->getPlayer()->getX(), playerFactoryArray[i]->getPlayer()->getY(), playerFactoryArray[i]->getPlayer()->getDirection(), playerFactoryArray[i]->getPlayer()->getMaxSpeedX());
+                        playerFactoryArray[j]->getPlayer()->setActivePlayerCoordinates(playerFactoryArray[i]->getPlayer()->getX(), playerFactoryArray[i]->getPlayer()->getY(), playerFactoryArray[i]->getPlayer()->getDirection(), playerFactoryArray[i]->getPlayer()->getMaxSpeedX(), playerFactoryArray[i]->getPlayer()->getCurrentSpeedX());
 					}
 				}
 			}
