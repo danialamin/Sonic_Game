@@ -20,6 +20,9 @@
 class Level { // abstract class
 protected:
     PlayerFactory** playerFactoryArray;
+	int activePlayerIndex;
+    Clock playerSwitchingClock;
+    float playerSwitchingClockTime;
     char** lvl;
     Texture wallTex1;
     Sprite wallSprite1;
@@ -39,6 +42,7 @@ public:
         }
         lvl[7][3] = 'w';
         lvl[9][5] = 'w';
+        lvl[9][180] = 'w';
 
         wallTex1.loadFromFile("Data/brick1.png");
         wallSprite1.setTexture(wallTex1);
@@ -50,30 +54,82 @@ public:
         enemyFactoryArray[3] = new CrabMeatFactory();
 
         playerFactoryArray = new PlayerFactory*[3];
-        playerFactoryArray[0] = new SonicFactory(); // 2: isPassive1
-        playerFactoryArray[1] = new TailsFactory(); // 1: isActive
-		playerFactoryArray[2] = new KnucklesFactory(); // 3: isPassive2
+        playerFactoryArray[0] = new SonicFactory(); 
+        playerFactoryArray[1] = new TailsFactory(); 
+		playerFactoryArray[2] = new KnucklesFactory(); 
 
         // calling create functions
-        playerFactoryArray[0]->createPlayer(2);
-        playerFactoryArray[1]->createPlayer(1);
-        playerFactoryArray[2]->createPlayer(3);
+        playerFactoryArray[0]->createPlayer(1); // 1: isActive
+        playerFactoryArray[1]->createPlayer(2); // 2: isPassive1
+        playerFactoryArray[2]->createPlayer(3); // 3: isPassive2
 
-        // toggle the following in a handleInput() function
-        playerFactoryArray[0]->getPlayer()->setIsActive(0);
-        playerFactoryArray[1]->getPlayer()->setIsActive(1);
+        activePlayerIndex = 0; // Sonic is the active player by default
+        playerFactoryArray[0]->getPlayer()->setIsActive(1);
+        playerFactoryArray[1]->getPlayer()->setIsActive(0);
         playerFactoryArray[2]->getPlayer()->setIsActive(0);
 
-		playerFactoryArray[0]->getPlayer()->setIsPassive1(1);
-		playerFactoryArray[1]->getPlayer()->setIsPassive1(0);
-		playerFactoryArray[2]->getPlayer()->setIsPassive1(0);
+        playerFactoryArray[0]->getPlayer()->setIsPassive1(0);
+        playerFactoryArray[1]->getPlayer()->setIsPassive1(1);
+        playerFactoryArray[2]->getPlayer()->setIsPassive1(0);
 
-		playerFactoryArray[0]->getPlayer()->setIsPassive2(0);
-		playerFactoryArray[1]->getPlayer()->setIsPassive2(0);
-		playerFactoryArray[2]->getPlayer()->setIsPassive2(1);
+        playerFactoryArray[0]->getPlayer()->setIsPassive2(0);
+        playerFactoryArray[1]->getPlayer()->setIsPassive2(0);
+        playerFactoryArray[2]->getPlayer()->setIsPassive2(1);
+        activePlayerIndex = 1;
     }
 
     // handleInput() to switch isActive attribute when 'S' is presses
+    void handleActivePlayerSwitching() {
+		playerSwitchingClockTime = playerSwitchingClock.getElapsedTime().asSeconds();
+        
+        if (Keyboard::isKeyPressed(Keyboard::S) && playerSwitchingClockTime>1.2) {
+            if (activePlayerIndex == 0) {
+                playerFactoryArray[0]->getPlayer()->setIsActive(1);
+                playerFactoryArray[1]->getPlayer()->setIsActive(0);
+                playerFactoryArray[2]->getPlayer()->setIsActive(0);
+
+                playerFactoryArray[0]->getPlayer()->setIsPassive1(0);
+                playerFactoryArray[1]->getPlayer()->setIsPassive1(1);
+                playerFactoryArray[2]->getPlayer()->setIsPassive1(0);
+
+                playerFactoryArray[0]->getPlayer()->setIsPassive2(0);
+                playerFactoryArray[1]->getPlayer()->setIsPassive2(0);
+                playerFactoryArray[2]->getPlayer()->setIsPassive2(1);
+                activePlayerIndex = 1;
+                playerSwitchingClock.restart();
+            }
+            else if (activePlayerIndex == 1 && playerSwitchingClockTime > 1.2) {
+                playerFactoryArray[0]->getPlayer()->setIsActive(0);
+                playerFactoryArray[1]->getPlayer()->setIsActive(1);
+                playerFactoryArray[2]->getPlayer()->setIsActive(0);
+
+                playerFactoryArray[0]->getPlayer()->setIsPassive1(0);
+                playerFactoryArray[1]->getPlayer()->setIsPassive1(0);
+                playerFactoryArray[2]->getPlayer()->setIsPassive1(1);
+
+                playerFactoryArray[0]->getPlayer()->setIsPassive2(1);
+                playerFactoryArray[1]->getPlayer()->setIsPassive2(0);
+                playerFactoryArray[2]->getPlayer()->setIsPassive2(0);
+                activePlayerIndex = 2;
+                playerSwitchingClock.restart();
+            }
+            else if (activePlayerIndex == 2 && playerSwitchingClockTime > 1.2) {
+                playerFactoryArray[0]->getPlayer()->setIsActive(0);
+                playerFactoryArray[1]->getPlayer()->setIsActive(0);
+                playerFactoryArray[2]->getPlayer()->setIsActive(1);
+
+                playerFactoryArray[0]->getPlayer()->setIsPassive1(1);
+                playerFactoryArray[1]->getPlayer()->setIsPassive1(0);
+                playerFactoryArray[2]->getPlayer()->setIsPassive1(0);
+
+                playerFactoryArray[0]->getPlayer()->setIsPassive2(0);
+                playerFactoryArray[1]->getPlayer()->setIsPassive2(1);
+                playerFactoryArray[2]->getPlayer()->setIsPassive2(0);
+                activePlayerIndex = 0;
+                playerSwitchingClock.restart();
+            }
+        }
+    }
 
     // getters
     char getCell(int i, int j) {

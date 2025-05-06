@@ -1,6 +1,7 @@
 #pragma once
 #include "Global_variables.h"
 #include "Level.h"
+#include "Player.h"
 
 class Knuckles : public Player {
 private:

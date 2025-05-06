@@ -179,12 +179,12 @@ public:
     // manageRun function applies acceleration, makes the player run if right/left keys are pressed
     void manageRun(bool isHorizontalKeyPressed, int direction) {
         if (collisionWithWallHorizontally) { // if player is colliding with wall then stop moving
-			velocityX = 0;
+            velocityX = 0;
             isHorizontalKeyPressed = false;
-			isDecelerating = false;
-			accelerationTime = 0.0f;
-			runClock.restart();
-			return; // EXIT THE FUNCTION
+            isDecelerating = false;
+            accelerationTime = 0.0f;
+            runClock.restart();
+            return; // EXIT THE FUNCTION
         }
 
         if (isHorizontalKeyPressed) {
@@ -227,10 +227,24 @@ public:
             }
 
             // Apply velocity to position
-            player_x += velocityX;
+            if (isPassive1 && direction == 1 && player_x < activePlayerCoordinates[0] - 70) {
+                player_x += velocityX;
+            }
+            else if (isPassive1 && direction == -1 && player_x > activePlayerCoordinates[0] + 70) {
+                player_x += velocityX;
+            }
+            else if (isPassive2 && direction == 1 && player_x < activePlayerCoordinates[0] - 140) {
+                player_x += velocityX;
+            }
+            else if (isPassive2 && direction == -1 && player_x > activePlayerCoordinates[0] + 140) {
+                player_x += velocityX;
+            }
+            else if (isActive) { // if active player then move normally
+                player_x += velocityX;
+            }
         }
         else { // right or left key not pressed
-			if (!isDecelerating && velocityX != 0) { // This is run only ONCE when the player stops moving
+            if (!isDecelerating && velocityX != 0) { // This is run only ONCE when the player stops moving
                 isDecelerating = true;
                 decelerationClock.restart();
                 decelerationTime = 0.0f;
@@ -246,7 +260,7 @@ public:
                 }
 
                 decelerationTimeLimit = velocityX / 4; // decelerationTimeLimit is dependent on the speed at which the player started to decelerate
-				if (decelerationTimeLimit < 0) decelerationTimeLimit *= -1; // make it positive
+                if (decelerationTimeLimit < 0) decelerationTimeLimit *= -1; // make it positive
             }
 
             // Apply deceleration if needed
@@ -257,7 +271,7 @@ public:
                     velocityX = 0.0f;
                     isDecelerating = false;
                 }
-				else { // if we are still decelerating
+                else { // if we are still decelerating
                     float decelerationFactor = 1.0f - (decelerationTime / decelerationTimeLimit); // deceleration factor: 1.0 at start, 0.0 at end
 
                     float currentSpeedDuringDeceleration = startDecelerationSpeed * decelerationFactor; // calculating current speed during deceleration using decelerationFactor
@@ -266,21 +280,50 @@ public:
                     velocityX = currentSpeedDuringDeceleration * decelerationDirection;
                 }
 
-                player_x += velocityX;
-            }
-
-            // Reset acceleration parameters if not moving
-            if (!isHorizontalKeyPressed && !isDecelerating) {
-                accelerationTime = 0.0f;
-                velocityX = 0.0f;
-                wasRightKeyHeld = false;
-                wasLeftKeyHeld = false;
-                runClock.restart();
+                if (isPassive1 && direction == 1 && player_x < activePlayerCoordinates[0] - 70) {
+                    player_x += velocityX;
+                }
+                else if (isPassive1 && direction == -1 && player_x > activePlayerCoordinates[0] + 70) {
+                    player_x += velocityX;
+                }
+                else if (isPassive2 && direction == 1 && player_x < activePlayerCoordinates[0] - 140) {
+                    player_x += velocityX;
+                }
+                else if (isPassive2 && direction == -1 && player_x > activePlayerCoordinates[0] + 140) {
+                    player_x += velocityX;
+                }
+                else if (isActive) { // if active player then move normally
+                    player_x += velocityX;
+                }
             }
         }
-    }
 
-    void checkCollisions(Level* level);
+        // Reset acceleration parameters if not moving
+        if (!isHorizontalKeyPressed && !isDecelerating) {
+            accelerationTime = 0.0f;
+            velocityX = 0.0f;
+            wasRightKeyHeld = false;
+            wasLeftKeyHeld = false;
+            runClock.restart();
+
+            if (isPassive1 && player_x<activePlayerCoordinates[0]-70 && direction==1) {
+                player_x += 5;
+			}
+			else if (isPassive1 && player_x > activePlayerCoordinates[0] + 70 && direction == -1) {
+				player_x -= 5;
+			}
+			else if (isPassive2 && player_x < activePlayerCoordinates[0] - 140 && direction == 1) {
+				player_x += 5;
+			}
+			else if (isPassive2 && player_x > activePlayerCoordinates[0] + 140 && direction == -1) {
+				player_x -= 5;
+			}
+        }
+    }
+    
+    
+
+    void checkCollisions(Level * level);
 
     void handleInput() {
         // call jump() if up Space/Up presses
@@ -302,39 +345,13 @@ public:
         }
 
         // Check if movement keys are pressed - but only allow movement if not in ball form and not ahead of active player
-        if (keyRightPressed && (!isABall||isABall && inAJump)) {
-            if (isActive) {
-                isHorizontalKeyPressed = true;
-                direction = 1;
-            }
-            else if (isPassive1 && player_x<activePlayerCoordinates[0]-10) {
-                isHorizontalKeyPressed = true;
-                direction = 1;
-            }
-            else if (isPassive2 && player_x < activePlayerCoordinates[0] - 15) {
-                isHorizontalKeyPressed = true;
-                direction = 1;
-            }
-            else {
-				isHorizontalKeyPressed = false;
-            }
+        if (keyRightPressed && (!isABall || isABall && inAJump)) {
+            isHorizontalKeyPressed = true;
+            direction = 1;
         }
         else if (keyLeftPressed && (!isABall || isABall && inAJump)) {
-            if (isActive) {
-                isHorizontalKeyPressed = true;
-                direction = -1;
-            }
-            else if (isPassive1 && player_x > activePlayerCoordinates[0] + 10) {
-                isHorizontalKeyPressed = true;
-                direction = -1;
-            }
-            else if (isPassive2 && player_x > activePlayerCoordinates[0] + 15) {
-                isHorizontalKeyPressed = true;
-                direction = -1;
-            }
-            else {
-				isHorizontalKeyPressed = false;
-            }
+            isHorizontalKeyPressed = true;
+            direction = -1;
         }
         else {
             isHorizontalKeyPressed = false;
@@ -361,10 +378,35 @@ public:
         }
     }
 
-    void applyGravity(Level* level);
+    void applyGravity(Level * level);
 
+    void isPlayerOutOfScreen(Camera& camera) {
+        if (!isActive) { // only passive players can be left out of screen
+            if (camera.worldToScreenX(player_x) < -200) { // if player left behind left edge
+                if (isPassive1) {
+                    player_x = activePlayerCoordinates[0] - 70;
+                    player_y = activePlayerCoordinates[1] - 100;
 
-    void draw(RenderWindow& window, Camera& camera) {
+                }
+                else if (isPassive2) {
+                    player_x = activePlayerCoordinates[0] - 140;
+                    player_y = activePlayerCoordinates[1] - 100;
+                }
+			}
+			else if (camera.worldToScreenX(player_x) > screen_x + 200) { // if player left behind right edge
+                if (isPassive1) {
+                    player_x = activePlayerCoordinates[0] + 70;
+                    player_y = activePlayerCoordinates[1] - 100;
+                }
+                else if (isPassive2) {
+                    player_x = activePlayerCoordinates[0] + 140;
+                    player_y = activePlayerCoordinates[1] - 100;
+                }
+            }
+        }
+    }
+
+    void draw(RenderWindow & window, Camera & camera) {
         // Calculate screen position
         float screenX = camera.worldToScreenX(player_x);
         float screenY = camera.worldToScreenY(player_y);
@@ -372,14 +414,14 @@ public:
         // Set sprite position to screen coordinates
         sprite.setPosition(screenX, screenY);
 
-		// Set the texture based on direction and ball form
-		if (isABall) {
-			if (direction == 1) {
-				sprite.setTexture(ballTextureRight);
-			}
-			else { 
-				sprite.setTexture(ballTextureLeft);
-			}
+        // Set the texture based on direction and ball form
+        if (isABall) {
+            if (direction == 1) {
+                sprite.setTexture(ballTextureRight);
+            }
+            else {
+                sprite.setTexture(ballTextureLeft);
+            }
         }
         else {
             if (direction == 1) {
@@ -395,6 +437,6 @@ public:
 
     // destructor needs to be virtual so that the children destructors get called before
     virtual ~Player() {
-		delete activePlayerCoordinates;
+        delete activePlayerCoordinates;
     }
 };

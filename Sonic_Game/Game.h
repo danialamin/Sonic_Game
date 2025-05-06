@@ -48,6 +48,7 @@ private:
 
     void update() {
         // shares the coordinates of the active player with the passive players
+        level->handleActivePlayerSwitching();
         level->activePlayerCoordinatesSharing();
 
         level->getSonic()->handleInput();
@@ -73,6 +74,11 @@ private:
         else {
             camera.update(level->getKnuckles()->getX(), level->getKnuckles()->getY());
         }
+
+		// check if players are out of screen
+		level->getSonic()->isPlayerOutOfScreen(camera);
+		level->getTails()->isPlayerOutOfScreen(camera);
+        level->getKnuckles()->isPlayerOutOfScreen(camera);
     }
 
     void render() {

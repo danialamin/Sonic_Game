@@ -1,5 +1,6 @@
 #pragma once
 #include "Global_variables.h"
+#include "Player.h"
 #include "Level.h"
 
 class Sonic : public Player {
