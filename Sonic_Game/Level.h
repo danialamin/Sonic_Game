@@ -26,6 +26,10 @@ protected:
     char** lvl;
     Texture wallTex1;
     Sprite wallSprite1;
+    Texture SpikeTex;
+    Sprite SpikeSprite;
+    Texture healthT;
+    Sprite healthS1, healthS2, healthS3;
     EnemyFactory** enemyFactoryArray;
 public:
     Level() {
@@ -38,7 +42,22 @@ public:
         lvl[11][2] = 'w';
         lvl[11][3] = 'w';
         for (int i = 4; i < 200; i++) {
-            lvl[11][i] = 'w';
+            if (i >= 50 && i<=55)
+            {
+                lvl[11][i] = '\0';
+            }
+
+            else if(i>=100 && i<=120){}
+            else{
+                lvl[11][i] = 'w';
+            }
+            
+        }
+        for (int i = 4; i < 200; i++) {
+           
+                lvl[13][i] = 'e';
+        
+
         }
         lvl[7][3] = 'w';
         lvl[9][5] = 'w';
@@ -46,6 +65,12 @@ public:
 
         wallTex1.loadFromFile("Data/brick1.png");
         wallSprite1.setTexture(wallTex1);
+        SpikeTex.loadFromFile("Data/spike.png");
+        SpikeSprite.setTexture(SpikeTex);
+        healthT.loadFromFile("Data/health.png");
+        healthS1.setTexture(healthT);
+        healthS2.setTexture(healthT);
+        healthS3.setTexture(healthT);
 
         enemyFactoryArray = new EnemyFactory*[4];
         enemyFactoryArray[0] = new BatBrainFactory();
@@ -140,6 +165,10 @@ public:
         return lvl[i][j];
     }
 
+    void setCell(char newC, int x, int y) {
+        lvl[x][y] = newC;
+    }
+
     Player* getSonic() {
         return playerFactoryArray[0]->getPlayer();
     }
@@ -174,7 +203,37 @@ public:
                         window.draw(wallSprite1);
                     }
                 }
+                if (lvl[i][j] == 's') {
+                    // Convert world coordinates to screen coordinates
+                    float worldX = j * cell_size;
+                    float worldY = i * cell_size;
+                    float screenX = camera.worldToScreenX(worldX);
+                    float screenY = camera.worldToScreenY(worldY);
+
+                    // Only draw if on screen (optimization)
+                    if (screenX > -cell_size && screenX < window.getSize().x &&
+                        screenY > -cell_size && screenY < window.getSize().y) {
+                        SpikeSprite.setPosition(screenX, screenY);
+                        window.draw(SpikeSprite);
+                    }
+                }
             }
+        }
+
+        if (playerFactoryArray[0]->getPlayer()->getHealth() >= 1) {
+            healthS1.setPosition(0, 0);
+            window.draw(healthS1);
+
+            if (playerFactoryArray[0]->getPlayer()->getHealth() >= 2) {
+                healthS2.setPosition(20, 0);
+                window.draw(healthS2);
+
+                if (playerFactoryArray[0]->getPlayer()->getHealth() == 3) {
+                    healthS3.setPosition(40, 0);
+                    window.draw(healthS3);
+                }
+            }
+            
         }
     }
 

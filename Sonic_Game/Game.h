@@ -16,7 +16,7 @@ public:
         window.setVerticalSyncEnabled(true);
         window.setFramerateLimit(60);
 
-        lvlMus.openFromFile("Data/labrynth.ogg");
+        lvlMus.openFromFile("Data/labrynth.wav");
         lvlMus.setVolume(30);
         lvlMus.play();
         lvlMus.setLoop(true);
@@ -44,6 +44,7 @@ private:
 
         if (Keyboard::isKeyPressed(Keyboard::Escape))
             window.close();
+        
     }
 
     void update() {
@@ -59,10 +60,12 @@ private:
 
         level->getTails()->handleInput();
         level->getTails()->checkCollisions(level);
+        level->getSonic()->checkInvincibility();
         level->getTails()->applyGravity(level);
 
         level->getKnuckles()->handleInput();
         level->getKnuckles()->checkCollisions(level);
+        level->getSonic()->checkInvincibility();
         level->getKnuckles()->applyGravity(level);
 
         // put camera on the player who is active

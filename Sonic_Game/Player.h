@@ -31,7 +31,7 @@ protected:
     bool onGround;
     float gravity;
     float terminal_Velocity;
-    int health; //TEMPORARY ADDED (AHMED)
+    static int health; //TEMPORARY ADDED (AHMED)
     Sprite sprite;
     Texture textureRight;
     Texture textureLeft;
@@ -115,13 +115,15 @@ public:
     bool getJump() {
         return inAJump;
     }
+    bool getHorizontalColl() { return collisionWithWallHorizontally; }
 
     void takeDamage() { //when player takes damage from enemies
-        if (isInvincible){}
-        else {
+        if (isInvincible) {}
+        else if(isActive) {
             health--;
             isInvincible = true;
             invincibleClock.restart();
+          
         }
     }
 
@@ -154,6 +156,8 @@ public:
 	float getCurrentSpeedX() {
 		return velocityX;
 	}
+
+    int getHealth() { return health; }
 
     // setters
     void setIsActive(bool arg) {
@@ -323,13 +327,15 @@ public:
     
     
 
-    void checkCollisions(Level * level);
+    virtual void checkCollisions(Level * level);
 
-    void handleInput() {
+    virtual void handleInput() {
         // call jump() if up Space/Up presses
         if (Keyboard::isKeyPressed(Keyboard::Space) || Keyboard::isKeyPressed(Keyboard::Up)) {
             jump();
         }
+
+        //
 
         bool keyRightPressed = Keyboard::isKeyPressed(Keyboard::Right);
         bool keyLeftPressed = Keyboard::isKeyPressed(Keyboard::Left);
@@ -440,3 +446,4 @@ public:
         delete activePlayerCoordinates;
     }
 };
+
