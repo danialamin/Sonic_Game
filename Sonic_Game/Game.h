@@ -3,6 +3,7 @@
 #include "Level.h"
 #include "PlayerFactory.h"
 #include "Camera.h"
+#include "Menu.h"
 
 class Game {
 private:
@@ -11,13 +12,16 @@ private:
     Level* level;
     Camera camera;
     Music lvlMus;
+    Menu menu;
+    int gameState;
+    int volume;
 public:
-    Game() : window(VideoMode(screen_x, screen_y), "Sonic the Hedgehog-OOP", Style::Close), level(new Level()), camera(800, 600) {
+    Game() : window(VideoMode(screen_x, screen_y), "Sonic the Hedgehog-OOP", Style::Close), level(new Level()), camera(800, 600), volume(30), gameState(0), menu() {
         window.setVerticalSyncEnabled(true);
         window.setFramerateLimit(60);
 
         lvlMus.openFromFile("Data/labrynth.wav");
-        lvlMus.setVolume(30);
+        lvlMus.setVolume(volume);
         lvlMus.play();
         lvlMus.setLoop(true);
     }
@@ -25,8 +29,18 @@ public:
     void run() {
         while (window.isOpen()) {
             handleEvents();
-            update();
-            render();
+            
+            if (gameState == 0) {
+                menu.draw(window);
+                menu.menuInput();
+                gameState = menu.getGameState();
+            }
+            else if(gameState == 1) {
+                
+                update();
+                render();
+            }
+            
         }
     }
 
