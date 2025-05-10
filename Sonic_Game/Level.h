@@ -16,6 +16,10 @@
 #include "Sonic.h"
 #include "Tails.h"
 #include "Knuckles.h"
+#include "Obstacle.h"
+#include "BreakableWall.h"
+#include "UnbreakableWall.h"
+#include "Spike.h"
 
 class Level { // abstract class
 protected:
@@ -38,6 +42,9 @@ protected:
     Sprite ringSprite;
     Texture healthT;
     Sprite healthS1, healthS2, healthS3, healthPickup;
+    Obstacle* breakableWall;
+    Obstacle* unbreakableWall;
+    Obstacle* spike;
 
 public:
     Level() {
@@ -178,6 +185,10 @@ public:
         playerFactoryArray[1]->getPlayer()->setIsPassive2(0);
         playerFactoryArray[2]->getPlayer()->setIsPassive2(1);
         activePlayerIndex = 1;
+
+        breakableWall = new BreakableWall(wallSprite2);
+        unbreakableWall = new UnbreakableWall(wallSprite1);
+        spike = new Spike(SpikeSprite);
     }
 
     // handleInput() to switch isActive attribute when 'Z' is presses
@@ -276,45 +287,33 @@ public:
         for (int i = 0; i < height; ++i) {
             for (int j = 0; j < width; ++j) {
                 if (lvl[i][j] == 'w') {
-                    // Convert world coordinates to screen coordinates
                     float worldX = j * cell_size;
                     float worldY = i * cell_size;
                     float screenX = camera.worldToScreenX(worldX);
                     float screenY = camera.worldToScreenY(worldY);
-
-                    // Only draw if on screen (optimization)
                     if (screenX > -cell_size && screenX < window.getSize().x &&
                         screenY > -cell_size && screenY < window.getSize().y) {
-                        wallSprite1.setPosition(screenX, screenY);
-                        window.draw(wallSprite1);
+                        unbreakableWall->draw(window, screenX, screenY);
                     }
                 }
                 if (lvl[i][j] == 's') {
-                    // Convert world coordinates to screen coordinates
                     float worldX = j * cell_size;
                     float worldY = i * cell_size;
                     float screenX = camera.worldToScreenX(worldX);
                     float screenY = camera.worldToScreenY(worldY);
-
-                    // Only draw if on screen (optimization)
                     if (screenX > -cell_size && screenX < window.getSize().x &&
                         screenY > -cell_size && screenY < window.getSize().y) {
-                        SpikeSprite.setPosition(screenX, screenY);
-                        window.draw(SpikeSprite);
+                        spike->draw(window, screenX, screenY);
                     }
                 }
                 if (lvl[i][j] == 'b') {
-                    // Convert world coordinates to screen coordinates
                     float worldX = j * cell_size;
                     float worldY = i * cell_size;
                     float screenX = camera.worldToScreenX(worldX);
                     float screenY = camera.worldToScreenY(worldY);
-
-                    // Only draw if on screen (optimization)
                     if (screenX > -cell_size && screenX < window.getSize().x &&
                         screenY > -cell_size && screenY < window.getSize().y) {
-                        wallSprite2.setPosition(screenX, screenY);
-                        window.draw(wallSprite2);
+                        breakableWall->draw(window, screenX, screenY);
                     }
                 }
                 if (lvl[i][j] == 'r') {

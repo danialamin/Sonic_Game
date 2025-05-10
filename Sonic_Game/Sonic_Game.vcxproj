@@ -139,6 +139,7 @@
     <ClCompile Include="Tails.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BreakableWall.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Crawler.h" />
     <ClInclude Include="Game.h" />
@@ -147,12 +148,15 @@
     <ClInclude Include="KnucklesFactory.h" />
     <ClInclude Include="Level.h" />
     <ClInclude Include="Level1.h" />
+    <ClInclude Include="Obstacle.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="PlayerFactory.h" />
     <ClInclude Include="Sonic.h" />
     <ClInclude Include="SonicFactory.h" />
+    <ClInclude Include="Spike.h" />
     <ClInclude Include="Tails.h" />
     <ClInclude Include="TailsFactory.h" />
+    <ClInclude Include="UnbreakableWall.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />
