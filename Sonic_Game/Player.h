@@ -6,6 +6,7 @@ class Level; // forward declaration to avoid circulation error
 
 class Player { // abstract class
 protected:
+    string name;
     float player_x, player_y; // world positions
     float velocityY;
     float velocityX;         // Added for horizontal movement
@@ -15,6 +16,7 @@ protected:
     bool isInvincible; //if the player is invincible
     Clock runClock;      // Clock to track acceleration time
     Clock invincibleClock; //clock for howlong a player is invincible
+	float invincibleClockTime; // how long the player has been invincible
     float accelerationTime;// For how long the player has been accelerating
     Clock decelerationClock; // Clock to track deceleration time
     float decelerationTime;  // For how long the player has been decelerating
@@ -31,7 +33,7 @@ protected:
     bool onGround;
     float gravity;
     float terminal_Velocity;
-    static int health; //TEMPORARY ADDED (AHMED)
+    int health; 
     Sprite sprite;
     Texture textureRight;
     Texture textureLeft;
@@ -43,16 +45,16 @@ protected:
     bool isActive; // true if player is active, false if passive
     bool isPassive1; // true if player is in the middle of the three players
     bool isPassive2; // true if player is behind two players
-	int* activePlayerCoordinates; // [0] = x, [1] = y, [2] = direction, [3] = maxSpeedX, [4] = currentSpeedX
-	float desiredX; // desired x position of the player if it is passive
-	float desiredY; // desired y position of the player if it is passive
+	int* activePlayerCoordinates; // [0] = x, [1] = y, [2] = direction, [3] = maxSpeedX
 	bool isABall; // tracks if player is in ball form or not
     Texture ballTextureRight;
     Texture ballTextureLeft;
+    bool isColliding;
 public:
-    Player(string textureRightPath, string textureLeftPath, int maxSpeedX_arg, string ballTextureRight_arg, string ballTextureLeft_arg, int activeOrPassive) { // attributes whose values are different per child, will be passed as parameter
-		activePlayerCoordinates = new int[5]; // [0] = x, [1] = y, [2] = direction, [3] = maxSpeedX, [4] = currentSpeedX
+    Player(string name, string textureRightPath, string textureLeftPath, int maxSpeedX_arg, string ballTextureRight_arg, string ballTextureLeft_arg, int activeOrPassive) { // attributes whose values are different per child, will be passed as parameter
+		activePlayerCoordinates = new int[4]; // [0] = x, [1] = y, [2] = direction, [3] = maxSpeedX
 
+        this->name = name;
         maxSpeedX = maxSpeedX_arg;
         velocityX = 0;
         accelerationX = 0;
@@ -100,7 +102,11 @@ public:
 		ballTextureLeft.loadFromFile(ballTextureLeft_arg);
         
         inAJump = false;
-        jumpForce = -20.0f; // negative is up
+        jumpForce = -17.0f; // negative is up
+		isInvincible = false; 
+        invincibleClockTime = 0;
+
+        health = 3;
     }
 
     // getters
@@ -117,21 +123,26 @@ public:
     }
     bool getHorizontalColl() { return collisionWithWallHorizontally; }
 
+    bool getIsABall() {
+        return isABall;
+    }
+
+	int getHealth() {
+		return health;
+	}
+
     void takeDamage() { //when player takes damage from enemies
-        if (isInvincible) {}
-        else if(isActive) {
+        if (!isInvincible) {
             health--;
-            isInvincible = true;
+			isInvincible = true; // make player invincible for 1 seconds
             invincibleClock.restart();
           
         }
     }
 
-    void checkInvincibility(){ //this is to check for invincibility
-        if (!isInvincible) { return; }
-
-        if (invincibleClock.getElapsedTime().asSeconds() >= 1) { isInvincible = false; }
-    }
+	int activePlayerHealthSharing() { // this function is called in the main loop and gives the health of the active player to the passive players
+        return health;
+	}
 
     bool getIsActive() {
         return isActive;
@@ -159,6 +170,10 @@ public:
 
     int getHealth() { return health; }
 
+	bool getIsInvincible() {
+		return isInvincible;
+	}
+
     // setters
     void setIsActive(bool arg) {
         isActive = arg;
@@ -174,13 +189,28 @@ public:
 
     
     void collectibleCollision(Level* level);
-	void setActivePlayerCoordinates(int x_arg, int y_arg, int direction_arg, int maxSpeedX_arg, float currentSpeedX_arg) {
+
+
+	void setActivePlayerCoordinates(int x_arg, int y_arg, int direction_arg, int maxSpeedX_arg) {
 		activePlayerCoordinates[0] = x_arg;
 		activePlayerCoordinates[1] = y_arg;
 		activePlayerCoordinates[2] = direction_arg;
         activePlayerCoordinates[3] = maxSpeedX_arg;
-        activePlayerCoordinates[4] = currentSpeedX_arg;
 	}
+
+	void setHealth(int arg) {
+		health = arg;
+	}
+
+	void isInvincibleUpdate() { // this function updates the value of isInvincible based on the invicibleClockTime
+        invincibleClockTime = invincibleClock.getElapsedTime().asSeconds();
+        if (invincibleClockTime < 1) {
+            isInvincible = true;
+        }
+        else {
+            isInvincible = false;
+        }
+    }
 
     // manageRun function applies acceleration, makes the player run if right/left keys are pressed
     void manageRun(bool isHorizontalKeyPressed, int direction) {
@@ -286,6 +316,7 @@ public:
                     velocityX = currentSpeedDuringDeceleration * decelerationDirection;
                 }
 
+				// only move passive players if they are behind active player
                 if (isPassive1 && direction == 1 && player_x < activePlayerCoordinates[0] - 70) {
                     player_x += velocityX;
                 }
@@ -312,6 +343,7 @@ public:
             wasLeftKeyHeld = false;
             runClock.restart();
 
+			// move passive players behind the active player
             if (isPassive1 && player_x<activePlayerCoordinates[0]-70 && direction==1) {
                 player_x += 5;
 			}
@@ -335,6 +367,7 @@ public:
         // call jump() if up Space/Up presses
         if (Keyboard::isKeyPressed(Keyboard::Space) || Keyboard::isKeyPressed(Keyboard::Up)) {
             jump();
+
         }
 
         //
@@ -342,7 +375,6 @@ public:
         bool keyRightPressed = Keyboard::isKeyPressed(Keyboard::Right);
         bool keyLeftPressed = Keyboard::isKeyPressed(Keyboard::Left);
         bool keyDownPressed = Keyboard::isKeyPressed(Keyboard::Down);
-
         // Handle ball form transition
         if (keyDownPressed && velocityX != 0) {
             isABall = true;
@@ -377,7 +409,7 @@ public:
         manageRun(isHorizontalKeyPressed, direction);
     }
 
-    void jump() {
+    virtual void jump() { // jump for tails is different hence virtual
         // Only allow jumping if the player is on the ground
         if (onGround && !inAJump) {
             velocityY = jumpForce;
@@ -386,29 +418,29 @@ public:
         }
     }
 
-    void applyGravity(Level * level);
+    virtual void applyGravity(Level * level); // applyGravity for tails is different
 
     void isPlayerOutOfScreen(Camera& camera) {
         if (!isActive) { // only passive players can be left out of screen
             if (camera.worldToScreenX(player_x) < -200) { // if player left behind left edge
                 if (isPassive1) {
                     player_x = activePlayerCoordinates[0] - 70;
-                    player_y = activePlayerCoordinates[1] - 100;
+                    player_y = activePlayerCoordinates[1] - 30;
 
                 }
                 else if (isPassive2) {
                     player_x = activePlayerCoordinates[0] - 140;
-                    player_y = activePlayerCoordinates[1] - 100;
+                    player_y = activePlayerCoordinates[1] - 30;
                 }
 			}
 			else if (camera.worldToScreenX(player_x) > screen_x + 200) { // if player left behind right edge
                 if (isPassive1) {
                     player_x = activePlayerCoordinates[0] + 70;
-                    player_y = activePlayerCoordinates[1] - 100;
+                    player_y = activePlayerCoordinates[1] - 30;
                 }
                 else if (isPassive2) {
                     player_x = activePlayerCoordinates[0] + 140;
-                    player_y = activePlayerCoordinates[1] - 100;
+                    player_y = activePlayerCoordinates[1] - 30;
                 }
             }
         }

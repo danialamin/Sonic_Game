@@ -12,9 +12,9 @@ private:
     Level* level;
     Camera camera;
     Music lvlMus;
-    Menu menu;
-    int gameState;
-    int volume;
+	int activePlayerIndex = 0; // 0 for sonic, 1 for tails, 2 for knuckles
+	int passive1PlayerIndex = 0;
+    int passive2PlayerIndex = 0; 
 public:
     Game() : window(VideoMode(screen_x, screen_y), "Sonic the Hedgehog-OOP", Style::Close), level(new Level()), camera(800, 600), volume(30), gameState(0), menu() {
         window.setVerticalSyncEnabled(true);
@@ -62,6 +62,23 @@ private:
     }
 
     void update() {
+        if (level->getActivePlayerIndex() != 0) {
+            activePlayerIndex = level->getActivePlayerIndex() - 1 ;
+            if (level->getActivePlayerIndex() == 1) {
+                passive1PlayerIndex = 1;
+				passive2PlayerIndex = 2;
+			}
+            else if (level->getActivePlayerIndex() == 2) {
+                passive1PlayerIndex = 2;
+				passive2PlayerIndex = 0;
+            }
+		}
+		else {
+			activePlayerIndex = 2;
+			passive1PlayerIndex = 0;
+			passive2PlayerIndex = 1;
+		}
+        
         // shares the coordinates of the active player with the passive players
         level->handleActivePlayerSwitching();
         level->activePlayerCoordinatesSharing();
@@ -70,7 +87,6 @@ private:
         level->getSonic()->checkCollisions(level);
         level->getSonic()->collectibleCollision(level);
         level->getSonic()->applyGravity(level);
-        level->getSonic()->checkInvincibility();
         camera.update(level->getSonic()->getX(), level->getSonic()->getY());
 
         level->getTails()->handleInput();
@@ -99,6 +115,49 @@ private:
 		level->getSonic()->isPlayerOutOfScreen(camera);
 		level->getTails()->isPlayerOutOfScreen(camera);
         level->getKnuckles()->isPlayerOutOfScreen(camera);
+
+        level->getSonic()->isInvincibleUpdate();
+        level->getTails()->isInvincibleUpdate();
+        level->getKnuckles()->isInvincibleUpdate();
+
+		// health sharing between playerz
+        int activePlayerHealth = level->getPlayerFactoryArray()[activePlayerIndex]->getPlayer()->activePlayerHealthSharing();
+		level->getPlayerFactoryArray()[passive1PlayerIndex]->getPlayer()->setHealth(activePlayerHealth);
+		level->getPlayerFactoryArray()[passive2PlayerIndex]->getPlayer()->setHealth(activePlayerHealth);
+
+        // ENEMIES
+        // move
+		level->getBatBrain()->move(level->getPlayerFactoryArray()[activePlayerIndex]->getPlayer()); // giving the active player as argument to batbrain
+        level->getMotoBug()->move(level->getPlayerFactoryArray()[activePlayerIndex]->getPlayer()); // giving the active player as argument to batbrain
+        level->getBeeBot()->move(level->getPlayerFactoryArray()[activePlayerIndex]->getPlayer()); // giving the active player as argument to batbrain although there's no need
+		level->getCrabMeat()->move(level->getPlayerFactoryArray()[activePlayerIndex]->getPlayer()); // giving the active player as argument to batbrain although there's no need
+
+        // enemy and player collision
+        level->getBatBrain()->checkCollisionWithPlayer(level->getSonic());
+        level->getBatBrain()->checkCollisionWithPlayer(level->getTails());
+        level->getBatBrain()->checkCollisionWithPlayer(level->getKnuckles());
+
+		level->getMotoBug()->checkCollisionWithPlayer(level->getPlayerFactoryArray()[activePlayerIndex]->getPlayer());
+        level->getMotoBug()->checkCollisionWithPlayer(level->getPlayerFactoryArray()[passive1PlayerIndex]->getPlayer());
+        level->getMotoBug()->checkCollisionWithPlayer(level->getPlayerFactoryArray()[passive2PlayerIndex]->getPlayer());
+
+		level->getBeeBot()->checkCollisionWithPlayer(level->getPlayerFactoryArray()[activePlayerIndex]->getPlayer());
+		level->getBeeBot()->checkCollisionWithPlayer(level->getPlayerFactoryArray()[passive1PlayerIndex]->getPlayer());
+		level->getBeeBot()->checkCollisionWithPlayer(level->getPlayerFactoryArray()[passive2PlayerIndex]->getPlayer());
+
+        level->getCrabMeat()->checkCollisionWithPlayer(level->getPlayerFactoryArray()[activePlayerIndex]->getPlayer());
+        level->getCrabMeat()->checkCollisionWithPlayer(level->getPlayerFactoryArray()[passive1PlayerIndex]->getPlayer());
+        level->getCrabMeat()->checkCollisionWithPlayer(level->getPlayerFactoryArray()[passive2PlayerIndex]->getPlayer());
+
+        // projectile and player collisions
+		for (int i = 0; i < 20; i++) { // max 20 projectiles for crabmeat and beebot
+            if (level->getBeeBot()->getProjectilesArray()[i] != nullptr && level->getBeeBot()->getProjectilesArray()[i]->isActive()) { // check collision only if projectile is active
+                level->getBeeBot()->getProjectilesArray()[i]->checkCollision(level->getPlayerFactoryArray()[activePlayerIndex]->getPlayer());
+            }
+            if (level->getCrabMeat()->getProjectilesArray()[i] != nullptr && level->getCrabMeat()->getProjectilesArray()[i]->isActive()) { // check collision only if projectile is active
+                level->getCrabMeat()->getProjectilesArray()[i]->checkCollision(level->getPlayerFactoryArray()[activePlayerIndex]->getPlayer());
+            }
+        }
     }
 
     void render() {
@@ -107,6 +166,10 @@ private:
         level->getSonic()->draw(window, camera);
         level->getTails()->draw(window, camera);
         level->getKnuckles()->draw(window, camera);
+		level->getBatBrain()->draw(window, camera);
+        level->getMotoBug()->draw(window, camera);
+		level->getBeeBot()->draw(window, camera);
+		level->getCrabMeat()->draw(window, camera);
         window.display();
     }
 };

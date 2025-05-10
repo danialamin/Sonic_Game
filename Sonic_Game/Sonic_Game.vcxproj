@@ -135,14 +135,17 @@
   <ItemGroup>
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Source.cpp" />
+    <ClCompile Include="Tails.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="Crawler.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Global_variables.h" />
     <ClInclude Include="Knuckles.h" />
     <ClInclude Include="KnucklesFactory.h" />
     <ClInclude Include="Level.h" />
+    <ClInclude Include="Level1.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="PlayerFactory.h" />
     <ClInclude Include="Sonic.h" />

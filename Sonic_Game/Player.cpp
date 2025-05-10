@@ -32,7 +32,7 @@ void Player::applyGravity(Level* level) {
 
 
     // Check for ground collision - use a small threshold to fix floating-point issues
-    bool groundCollision = ((bottom_left == 'w' || bottom_mid == 'w' || bottom_right == 'w') || (bottom_left == 's' || bottom_mid == 's' || bottom_right == 's')|| (bottom_left == 'e' || bottom_mid == 'e' || bottom_right == 'e') || (bottom_left == 'b' || bottom_mid == 'b' || bottom_right == 'b'));
+    bool groundCollision = (bottom_mid == 'w' || bottom_mid == 's' || bottom_mid == 'e' || bottom_mid == 'b');
 
     if (groundCollision) {
         // On ground - stop falling
@@ -114,7 +114,6 @@ void Player::checkCollisions(Level* level) {
             collisionWithWallHorizontally = false;
         }
     }
-
 	// checking collision with wall to the top
     //float offset_y = player_y + velocityY; // Calculate the offset position based on the current velocity
     //if (velocityY < 0) {

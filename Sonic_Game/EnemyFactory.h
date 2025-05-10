@@ -9,7 +9,7 @@ protected:
 
 public:
 	// pure virtual function
-	virtual void createEnemy(float x, float y) = 0;
+	virtual void createEnemy(float x, float y, float x_limit[2], float y_limit[2]) = 0;
 
 	// getters
 	Enemy* getEnemy() {

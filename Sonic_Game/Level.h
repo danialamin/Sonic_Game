@@ -20,11 +20,12 @@
 class Level { // abstract class
 protected:
     PlayerFactory** playerFactoryArray;
-	int activePlayerIndex;
-    Clock playerSwitchingClock;
+	int activePlayerIndex; // 0 for sonic, 1 for tails, 2 for knuckles
+    Clock playerSwitchingClock; // after how much time pressing can change the player
     float playerSwitchingClockTime;
     Font scoreFont;
     Text scoreText;
+    EnemyFactory** enemyFactoryArray;
     char** lvl;
     int ringCount;
     Texture wallTex1;
@@ -37,7 +38,7 @@ protected:
     Sprite ringSprite;
     Texture healthT;
     Sprite healthS1, healthS2, healthS3, healthPickup;
-    EnemyFactory** enemyFactoryArray;
+
 public:
     Level() {
         char lvlArray[14][200]= {
@@ -93,8 +94,21 @@ public:
 
         }
         lvl[7][3] = 'w';
+        lvl[6][4] = 'w';
+        lvl[8][7] = 'w';
+        lvl[7][8] = 'w';
+        lvl[6][9] = 'w';
         lvl[9][5] = 'w';
+
         lvl[9][180] = 'w';*/
+
+  //      lvl[9][6] = 'w';
+  //      lvl[9][180] = 'w';
+		//lvl[1][12] = 'w';
+  //      lvl[2][12] = 'w';
+  //      lvl[3][12] = 'w';
+  //      lvl[4][12] = 'w';
+  //      lvl[5][12] = 'w';
 
         wallTex1.loadFromFile("Data/brick1.png");
         wallSprite1.setTexture(wallTex1);
@@ -121,19 +135,35 @@ public:
 
         enemyFactoryArray = new EnemyFactory*[4];
         enemyFactoryArray[0] = new BatBrainFactory();
-        enemyFactoryArray[1] = new MotoBugFactory();
-        enemyFactoryArray[2] = new BeeBotFactory();
+        enemyFactoryArray[1] = new BeeBotFactory();
+        enemyFactoryArray[2] = new MotoBugFactory();
         enemyFactoryArray[3] = new CrabMeatFactory();
 
+        // calling create functions of enemies
+		float x_limit_batbrain[2] = { 0, 0 };
+        float y_limit_batbrain[2] = { 0, 0 };
+		float x_limit_motobug[2] = { 950, 1150 };
+		float y_limit_motobug[2] = { 650, 650 };
+        float x_limit_beebot[2] = { 200, 350 };
+        float y_limit_beebot[2] = { 250, 490 };
+		float x_limit_crabmeat[2] = { 600, 800 };
+		float y_limit_crabmeat[2] = { 660, 660 };
+		enemyFactoryArray[0]->createEnemy(8000, 610, x_limit_batbrain, y_limit_batbrain); // BatBrain
+		enemyFactoryArray[1]->createEnemy(100, 200, x_limit_beebot, y_limit_beebot); // BeeBot
+        enemyFactoryArray[2]->createEnemy(1000, 660, x_limit_motobug, y_limit_motobug); // MotoBug
+		enemyFactoryArray[3]->createEnemy(600, 660, x_limit_crabmeat, y_limit_crabmeat); // CrabMeat
+
+
         playerFactoryArray = new PlayerFactory*[3];
-        playerFactoryArray[0] = new SonicFactory(); 
-        playerFactoryArray[1] = new TailsFactory(); 
+        playerFactoryArray[0] = new SonicFactory();
+        playerFactoryArray[1] = new TailsFactory();
 		playerFactoryArray[2] = new KnucklesFactory(); 
 
-        // calling create functions
+        // calling create functions of players
         playerFactoryArray[0]->createPlayer(1); // 1: isActive
         playerFactoryArray[1]->createPlayer(2); // 2: isPassive1
         playerFactoryArray[2]->createPlayer(3); // 3: isPassive2
+
 
         activePlayerIndex = 0; // Sonic is the active player by default
         playerFactoryArray[0]->getPlayer()->setIsActive(1);
@@ -150,11 +180,11 @@ public:
         activePlayerIndex = 1;
     }
 
-    // handleInput() to switch isActive attribute when 'S' is presses
+    // handleInput() to switch isActive attribute when 'Z' is presses
     void handleActivePlayerSwitching() {
 		playerSwitchingClockTime = playerSwitchingClock.getElapsedTime().asSeconds();
         
-        if (Keyboard::isKeyPressed(Keyboard::S) && playerSwitchingClockTime>1.2) {
+        if (Keyboard::isKeyPressed(Keyboard::Z) && playerSwitchingClockTime>1.2) {
             if (activePlayerIndex == 0) {
                 playerFactoryArray[0]->getPlayer()->setIsActive(1);
                 playerFactoryArray[1]->getPlayer()->setIsActive(0);
@@ -205,12 +235,18 @@ public:
 
 
     // getters
+	PlayerFactory** getPlayerFactoryArray() {
+		return playerFactoryArray;
+	}
+    int getActivePlayerIndex() {
+		return activePlayerIndex;
+    }
     char getCell(int i, int j) {
         if (i >= height || j >= width || i < 0 || j < 0) {
             cout << "error happened because out of bounds access: ";
             cout << "i " << i << " j " << j << endl;
         }
-        return lvl[i][j];
+          return lvl[i][j];
     }
 
     void setCell(char newC, int x, int y) {
@@ -222,16 +258,13 @@ public:
     Player* getSonic() {
         return playerFactoryArray[0]->getPlayer();
     }
-
     Enemy* getBatBrain() {return enemyFactoryArray[0]->getEnemy();}
-    Enemy* getMotoBug() { return enemyFactoryArray[1]->getEnemy(); }
-    Enemy* getBeeBot() { return enemyFactoryArray[2]->getEnemy(); }
+    Enemy* getBeeBot() { return enemyFactoryArray[1]->getEnemy(); }
+    Enemy* getMotoBug() { return enemyFactoryArray[2]->getEnemy(); }
     Enemy* getCrabMeat() { return enemyFactoryArray[3]->getEnemy(); }
-
     Player* getTails() {
         return playerFactoryArray[1]->getPlayer();
     }
-
     Player* getKnuckles() {
         return playerFactoryArray[2]->getPlayer();
     }
@@ -342,14 +375,14 @@ public:
 			if (playerFactoryArray[i]->getPlayer()->getIsActive() == 1) {
 				for (int j = 0; j < 3; j++) {
 					if (i != j) {
-                        playerFactoryArray[j]->getPlayer()->setActivePlayerCoordinates(playerFactoryArray[i]->getPlayer()->getX(), playerFactoryArray[i]->getPlayer()->getY(), playerFactoryArray[i]->getPlayer()->getDirection(), playerFactoryArray[i]->getPlayer()->getMaxSpeedX(), playerFactoryArray[i]->getPlayer()->getCurrentSpeedX());
+                        playerFactoryArray[j]->getPlayer()->setActivePlayerCoordinates(playerFactoryArray[i]->getPlayer()->getX(), playerFactoryArray[i]->getPlayer()->getY(), playerFactoryArray[i]->getPlayer()->getDirection(), playerFactoryArray[i]->getPlayer()->getMaxSpeedX());
 					}
 				}
 			}
 		}
 	}
 
-    ~Level() {
+    virtual ~Level() {
         for (int i = 0; i < height; ++i) {
             delete[] lvl[i];
         }
