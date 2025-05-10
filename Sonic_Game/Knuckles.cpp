@@ -20,8 +20,8 @@ void Knuckles::checkCollisions(Level* level) {
         char left_mid = level->getCell(mid_y, left_x);
         char left_bottom = level->getCell(bottom_y, left_x);
 
-        if (left_top == 'w' || left_mid == 'w' || left_bottom == 'w') { // Collision detected
-            if (isActive) { Punch(level); }
+        if ((left_top == 'b' || left_mid == 'b' || left_bottom == 'b') || (left_top == 'w' || left_mid== 'w' || left_bottom== 'w')) { // Collision detected
+            if (isActive && (left_top == 'b' || left_mid == 'b' || left_bottom == 'b')) { Punch(level); }
             else {
                 collisionWithWallHorizontally = true;
             }
@@ -43,9 +43,9 @@ void Knuckles::checkCollisions(Level* level) {
         char right_mid = level->getCell(mid_y, right_x);
         char right_bottom = level->getCell(bottom_y, right_x);
 
-        if (right_top == 'w' || right_mid == 'w' || right_bottom == 'w') { // collision detected
+        if ((right_top == 'w' || right_mid == 'w' || right_bottom == 'w')|| (right_top == 'b' || right_mid == 'b' || right_bottom == 'b')) { // collision detected
             
-            if (isActive) { Punch(level); }
+            if (isActive && (right_top == 'b' || right_mid == 'b' || right_bottom == 'b')) { Punch(level); }
             else
                 collisionWithWallHorizontally = true;
         }

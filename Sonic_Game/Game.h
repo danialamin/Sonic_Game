@@ -68,17 +68,20 @@ private:
 
         level->getSonic()->handleInput();
         level->getSonic()->checkCollisions(level);
+        level->getSonic()->collectibleCollision(level);
         level->getSonic()->applyGravity(level);
         level->getSonic()->checkInvincibility();
         camera.update(level->getSonic()->getX(), level->getSonic()->getY());
 
         level->getTails()->handleInput();
         level->getTails()->checkCollisions(level);
+        level->getTails()->collectibleCollision(level);
         level->getSonic()->checkInvincibility();
         level->getTails()->applyGravity(level);
 
         level->getKnuckles()->handleInput();
         level->getKnuckles()->checkCollisions(level);
+        level->getSonic()->collectibleCollision(level);
         level->getSonic()->checkInvincibility();
         level->getKnuckles()->applyGravity(level);
 

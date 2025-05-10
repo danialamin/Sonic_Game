@@ -172,6 +172,8 @@ public:
 		isPassive2 = arg;
 	}
 
+    
+    void collectibleCollision(Level* level);
 	void setActivePlayerCoordinates(int x_arg, int y_arg, int direction_arg, int maxSpeedX_arg, float currentSpeedX_arg) {
 		activePlayerCoordinates[0] = x_arg;
 		activePlayerCoordinates[1] = y_arg;

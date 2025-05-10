@@ -23,23 +23,56 @@ protected:
 	int activePlayerIndex;
     Clock playerSwitchingClock;
     float playerSwitchingClockTime;
+    Font scoreFont;
+    Text scoreText;
     char** lvl;
+    int ringCount;
     Texture wallTex1;
     Sprite wallSprite1;
+    Texture wallTex2;
+    Sprite wallSprite2;
     Texture SpikeTex;
     Sprite SpikeSprite;
+    Texture ringText;
+    Sprite ringSprite;
     Texture healthT;
-    Sprite healthS1, healthS2, healthS3;
+    Sprite healthS1, healthS2, healthS3, healthPickup;
     EnemyFactory** enemyFactoryArray;
 public:
     Level() {
+        char lvlArray[14][200]= {
+    "     wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww",
+    "w                                                                                                                        b                                                                         w",
+    "w                                                                                                                        b                                                                         w",
+    "w                                                                                                                        b                                                                         w",
+    "w                                                                                                                        b                                                                         w",
+    "w                                                                                                                        b                                                                         w",
+    "w                                                                                                                        b                                                                         w",
+    "w                                                                                                                        b                                                                         w",
+    "w                 rrrrrr                                                                                                 b                                                                         w",
+    "w     w                                                                                                                  b                                                                         w",
+    "w       w                        www                        www                                                          b                                                                         w",
+    "w           rrrrrrrrrrrrrrrrrh      rrrr                   wwwwwww                 ssss              h                   b                                                                         w",
+    "wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww  wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww",
+    "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+        };
+        ringCount = 0;
         lvl = new char* [height];
         for (int i = 0; i < height; ++i) {
             lvl[i] = new char[200];
         }
+        for (int i = 0; i < 14; i++)
+        {
+            for (int j= 0; j < 200; j++)
+            {
+                lvl[i][j] = lvlArray[i][j];
+                if (lvlArray[i][j] == 'r') ringCount++;
+            }
+        }
+
         // Example layout
-        lvl[11][1] = 'w';
-        lvl[11][2] = 'w';
+        //lvl[11][1] = 'w';
+        /*lvl[11][2] = 'w';
         lvl[11][3] = 'w';
         for (int i = 4; i < 200; i++) {
             if (i >= 50 && i<=55)
@@ -61,16 +94,30 @@ public:
         }
         lvl[7][3] = 'w';
         lvl[9][5] = 'w';
-        lvl[9][180] = 'w';
+        lvl[9][180] = 'w';*/
 
         wallTex1.loadFromFile("Data/brick1.png");
         wallSprite1.setTexture(wallTex1);
         SpikeTex.loadFromFile("Data/spike.png");
         SpikeSprite.setTexture(SpikeTex);
         healthT.loadFromFile("Data/health.png");
+        wallTex2.loadFromFile("Data/brick3.png");
+        wallSprite2.setTexture(wallTex2);
         healthS1.setTexture(healthT);
         healthS2.setTexture(healthT);
         healthS3.setTexture(healthT);
+        healthPickup.setTexture(healthT);
+        ringText.loadFromFile("Data/ring.png");
+        ringSprite.setTexture(ringText);
+        ringSprite.setScale(2, 2);
+
+        scoreFont.loadFromFile("Data/scoreFont.ttf");
+        scoreText.setFont(scoreFont);
+        scoreText.setCharacterSize(30);
+        scoreText.setString(to_string(ringCount));
+        scoreText.setPosition(1000, 860);
+        scoreText.setFillColor(Color::White);
+
 
         enemyFactoryArray = new EnemyFactory*[4];
         enemyFactoryArray[0] = new BatBrainFactory();
@@ -154,7 +201,8 @@ public:
                 playerSwitchingClock.restart();
             }
         }
-    }
+    }   
+
 
     // getters
     char getCell(int i, int j) {
@@ -168,6 +216,8 @@ public:
     void setCell(char newC, int x, int y) {
         lvl[x][y] = newC;
     }
+
+    void collectRing() { ringCount--; scoreText.setString(to_string(ringCount)); }
 
     Player* getSonic() {
         return playerFactoryArray[0]->getPlayer();
@@ -187,6 +237,9 @@ public:
     }
 
     void draw(RenderWindow& window, Camera& camera) {
+        
+        
+        
         for (int i = 0; i < height; ++i) {
             for (int j = 0; j < width; ++j) {
                 if (lvl[i][j] == 'w') {
@@ -217,6 +270,50 @@ public:
                         window.draw(SpikeSprite);
                     }
                 }
+                if (lvl[i][j] == 'b') {
+                    // Convert world coordinates to screen coordinates
+                    float worldX = j * cell_size;
+                    float worldY = i * cell_size;
+                    float screenX = camera.worldToScreenX(worldX);
+                    float screenY = camera.worldToScreenY(worldY);
+
+                    // Only draw if on screen (optimization)
+                    if (screenX > -cell_size && screenX < window.getSize().x &&
+                        screenY > -cell_size && screenY < window.getSize().y) {
+                        wallSprite2.setPosition(screenX, screenY);
+                        window.draw(wallSprite2);
+                    }
+                }
+                if (lvl[i][j] == 'r') {
+                    // Convert world coordinates to screen coordinates
+                    float worldX = j * cell_size;
+                    float worldY = i * cell_size;
+                    float screenX = camera.worldToScreenX(worldX);
+                    float screenY = camera.worldToScreenY(worldY);
+
+                    // Only draw if on screen (optimization)
+                    if (screenX > -cell_size && screenX < window.getSize().x &&
+                        screenY > -cell_size && screenY < window.getSize().y) {
+                        ringSprite.setPosition(screenX, screenY);
+                        window.draw(ringSprite);
+                    }
+                }
+                if (lvl[i][j] == 'h') {
+                    // Convert world coordinates to screen coordinates
+                    float worldX = j * cell_size;
+                    float worldY = i * cell_size;
+                    float screenX = camera.worldToScreenX(worldX);
+                    float screenY = camera.worldToScreenY(worldY);
+
+                    // Only draw if on screen (optimization)
+                    if (screenX > -cell_size && screenX < window.getSize().x &&
+                        screenY > -cell_size && screenY < window.getSize().y) {
+                        healthPickup.setPosition(screenX, screenY);
+                        healthPickup.setScale(2, 2);
+                        window.draw(healthPickup);
+                    }
+                }
+
             }
         }
 
@@ -235,6 +332,8 @@ public:
             }
             
         }
+
+        window.draw(scoreText);
     }
 
 	// this function is called in the main loop and gives the coordinates of the active player to the passive players

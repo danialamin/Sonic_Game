@@ -32,14 +32,14 @@ void Player::applyGravity(Level* level) {
 
 
     // Check for ground collision - use a small threshold to fix floating-point issues
-    bool groundCollision = ((bottom_left == 'w' || bottom_mid == 'w' || bottom_right == 'w') || (bottom_left == 's' || bottom_mid == 's' || bottom_right == 's')|| (bottom_left == 'e' || bottom_mid == 'e' || bottom_right == 'e'));
+    bool groundCollision = ((bottom_left == 'w' || bottom_mid == 'w' || bottom_right == 'w') || (bottom_left == 's' || bottom_mid == 's' || bottom_right == 's')|| (bottom_left == 'e' || bottom_mid == 'e' || bottom_right == 'e') || (bottom_left == 'b' || bottom_mid == 'b' || bottom_right == 'b'));
 
     if (groundCollision) {
         // On ground - stop falling
         if ((bottom_left == 's' || bottom_mid == 's' || bottom_right == 's')) {
             takeDamage();
         }
-        else if (bottom_left == 'e' || bottom_mid == 'e' || bottom_right == 'e') {
+        else if ((bottom_left == 'e' || bottom_mid == 'e' || bottom_right == 'e')&& isActive) {
             health = 0;
         }
         onGround = true;
@@ -88,7 +88,7 @@ void Player::checkCollisions(Level* level) {
         char left_mid = level->getCell(mid_y, left_x);
         char left_bottom = level->getCell(bottom_y, left_x);
 
-        if (left_top == 'w' || left_mid == 'w' || left_bottom == 'w') { // Collision detected
+        if ((left_top == 'w' || left_mid == 'w' || left_bottom == 'w') || (left_top == 'b' || left_mid == 'b' || left_bottom == 'b')) { // Collision detected
             collisionWithWallHorizontally = true;
         }
         else {
@@ -107,7 +107,7 @@ void Player::checkCollisions(Level* level) {
         char right_mid = level->getCell(mid_y, right_x);
         char right_bottom = level->getCell(bottom_y, right_x);
 
-        if (right_top == 'w' || right_mid == 'w' || right_bottom == 'w') { // collision detected
+        if ((right_top == 'w' || right_mid == 'w' || right_bottom == 'w') || (right_top == 'b' || right_mid == 'b' || right_bottom == 'b')) { // collision detected
             collisionWithWallHorizontally = true;
         }
         else {
@@ -144,4 +144,103 @@ void Player::checkCollisions(Level* level) {
     //else { // Not moving upward, so no ceiling collision possible
     //    collisionWithWallAbove = false;
     //}
+}
+
+void Player::collectibleCollision(Level* level) {
+    // Calculate new position with velocity
+    float offset_y = player_y + velocityY;
+    float offset_x = player_x + velocityX;
+
+    // Check if there's ground beneath the player
+    int bottom_left_cell_y = (int)(offset_y + hit_box_factor_y + Pheight) / cell_size;
+    int bottom_left_cell_x = (int)(player_x + hit_box_factor_x) / cell_size;
+
+    int bottom_right_cell_y = (int)(offset_y + hit_box_factor_y + Pheight) / cell_size;
+    int bottom_right_cell_x = (int)(player_x + hit_box_factor_x + Pwidth) / cell_size;
+
+    int bottom_mid_cell_y = (int)(offset_y + hit_box_factor_y + Pheight) / cell_size;
+    int bottom_mid_cell_x = (int)(player_x + hit_box_factor_x + Pwidth / 2) / cell_size;
+
+    // Get the cell types
+    char bottom_left = level->getCell(bottom_left_cell_y, bottom_left_cell_x);
+    char bottom_right = level->getCell(bottom_right_cell_y, bottom_right_cell_x);
+    char bottom_mid = level->getCell(bottom_mid_cell_y, bottom_mid_cell_x);
+
+    int left_x = (int)(offset_x + hit_box_factor_x) / cell_size;
+    int top_y = (int)(player_y + hit_box_factor_y) / cell_size;
+    int mid_y = (int)(player_y + hit_box_factor_y + Pheight / 2) / cell_size;
+    int bottom_y = (int)(player_y + hit_box_factor_y + Pheight - 1) / cell_size;
+
+    char left_top = level->getCell(top_y, left_x);
+    char left_mid = level->getCell(mid_y, left_x);
+    char left_bottom = level->getCell(bottom_y, left_x);
+
+    int right_x = (int)(offset_x + hit_box_factor_x + Pwidth) / cell_size;
+    //int top_y = (int)(player_y + hit_box_factor_y) / cell_size;
+    //int mid_y = (int)(player_y + hit_box_factor_y + Pheight / 2) / cell_size;
+    //int bottom_y = (int)(player_y + hit_box_factor_y + Pheight - 1) / cell_size;
+
+    char right_top = level->getCell(top_y, right_x);
+    char right_mid = level->getCell(mid_y, right_x);
+    char right_bottom = level->getCell(bottom_y, right_x);
+
+    //int top_y = (int)(offset_y + hit_box_factor_y) / cell_size;
+    //int left_x = (int)(player_x + hit_box_factor_x) / cell_size;
+    int mid_x = (int)(player_x + hit_box_factor_x + Pwidth / 2) / cell_size;
+    //int right_x = (int)(player_x + hit_box_factor_x + Pwidth - 1) / cell_size;
+    // Check the cells at these positions
+    char top_left = level->getCell(top_y, left_x);
+    char top_mid = level->getCell(top_y, mid_x);
+    char top_right = level->getCell(top_y, right_x);
+    // ('r' || 'h' || 'x'
+    if (((bottom_left == 'r' || bottom_mid == 'r' || bottom_right == 'r') || (right_top == 'r' || right_mid == 'r' || right_bottom == 'r') || (left_top == 'r' || left_mid == 'r' || left_bottom == 'r') || (top_left == 'r' || top_mid == 'r' || top_right == 'r')) && isActive) {
+        level->collectRing();
+        if ((bottom_left == 'r' || bottom_mid == 'r' || bottom_right == 'r')) {
+            level->setCell(' ', bottom_left_cell_y, bottom_left_cell_x);
+            level->setCell(' ',bottom_right_cell_y, bottom_right_cell_x);
+            level->setCell(' ', bottom_mid_cell_y, bottom_mid_cell_x);
+
+        }
+        if ((right_top == 'r' || right_mid == 'r' || right_bottom == 'r')) {
+            level->setCell(' ', top_y, right_x);
+            level->setCell(' ', mid_y, right_x);
+            level->setCell(' ', bottom_y, right_x);
+        }
+
+        if ((left_top == 'r' || left_mid == 'r' || left_bottom == 'r')) {
+            level->setCell(' ', top_y, left_x);
+            level->setCell(' ', mid_y, left_x);
+            level->setCell(' ', bottom_y, left_x);
+        }
+        if ((top_left == 'r' || top_mid == 'r' || top_right == 'r')) {
+            level->setCell(' ',top_y, left_x);
+            level->setCell(' ',top_y, mid_x);
+            level->setCell(' ',top_y, right_x);
+        }
+    }
+    if (((bottom_left == 'h' || bottom_mid == 'h' || bottom_right == 'h') || (right_top == 'h' || right_mid == 'h' || right_bottom == 'h') || (left_top == 'h' || left_mid == 'h' || left_bottom == 'h') || (top_left == 'h' || top_mid == 'h' || top_right == 'h')) && isActive && (health == 1 || health ==2)) {
+        health++;
+        if ((bottom_left == 'h' || bottom_mid == 'h' || bottom_right == 'h')) {
+            level->setCell(' ', bottom_left_cell_y, bottom_left_cell_x);
+            level->setCell(' ', bottom_right_cell_y, bottom_right_cell_x);
+            level->setCell(' ', bottom_mid_cell_y, bottom_mid_cell_x);
+        }
+        if ((right_top == 'h' || right_mid == 'h' || right_bottom == 'h')) {
+            level->setCell(' ', top_y, right_x);
+            level->setCell(' ', mid_y, right_x);
+            level->setCell(' ', bottom_y, right_x);
+        }
+        if ((left_top == 'h' || left_mid == 'h' || left_bottom == 'h')) {
+            level->setCell(' ', top_y, left_x);
+            level->setCell(' ', mid_y, left_x);
+            level->setCell(' ', bottom_y, left_x);
+        }
+        if ((top_left == 'h' || top_mid == 'h' || top_right == 'h')) {
+            level->setCell(' ', top_y, left_x);
+            level->setCell(' ', top_y, mid_x);
+            level->setCell(' ', top_y, right_x);
+        }
+    }
+
+
 }
