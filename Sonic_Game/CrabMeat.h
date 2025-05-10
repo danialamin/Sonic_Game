@@ -94,7 +94,7 @@ public:
     void checkCollisionWithPlayer(Player* p) override {
         if (health>0)
         if (p->getX() - x > 0) { // player is to the right of the crab
-            if (p->getX() - x < 46 && (p->getY() >= y ? (false) : (y - p->getY() < 95 ? true : false))) {
+            if (p->getX() - x < 90 && (p->getY() >= y ? (false) : (y - p->getY() < 95 ? true : false))) {
                 if (!p->getIsABall() && !p->getIsInvincible() && p->getIsActive()) { // collision happened while player was not a ball and not invincible
                     p->takeDamage(); // player's health decreases
                     cout << "p->health--" << endl;
@@ -114,7 +114,7 @@ public:
             }
         }
         else { // player is to the left of the crab
-            if (x - p->getX() < 46 && (p->getY() >= y ? (false) : (y - p->getY() < 95 ? true : false))) {
+            if (x - p->getX() < 90 && (p->getY() >= y ? (false) : (y - p->getY() < 95 ? true : false))) {
                 if (!p->getIsABall() && !p->getIsInvincible() && p->getIsActive()) { // collision happened while player was not a ball and not invincible
                     p->takeDamage(); // player's health decreases
                     cout << "p->health--" << endl;

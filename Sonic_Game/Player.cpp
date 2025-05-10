@@ -4,10 +4,6 @@
 // making this class so i can include "Level.h" without facing the problem of circular dependecny, where Level.h includes Player and Player.h includes Level
 
 
-
-int Player::health = 3;
-
-
 void Player::applyGravity(Level* level) {
     // Store previous state for comparison
     bool wasInAJump = inAJump;
@@ -115,34 +111,34 @@ void Player::checkCollisions(Level* level) {
         }
     }
 	// checking collision with wall to the top
-    //float offset_y = player_y + velocityY; // Calculate the offset position based on the current velocity
-    //if (velocityY < 0) {
-    //    // Get three points along the top side of the player's hitbox
-    //    int top_y = (int)(offset_y + hit_box_factor_y) / cell_size;
-    //    int left_x = (int)(player_x + hit_box_factor_x) / cell_size;
-    //    int mid_x = (int)(player_x + hit_box_factor_x + Pwidth / 2) / cell_size;
-    //    int right_x = (int)(player_x + hit_box_factor_x + Pwidth - 1) / cell_size;
+    float offset_y = player_y + velocityY; // Calculate the offset position based on the current velocity
+    if (velocityY < 0) {
+        // Get three points along the top side of the player's hitbox
+        int top_y = (int)(offset_y + hit_box_factor_y) / cell_size;
+        int left_x = (int)(player_x + hit_box_factor_x) / cell_size;
+        int mid_x = (int)(player_x + hit_box_factor_x + Pwidth / 2) / cell_size;
+        int right_x = (int)(player_x + hit_box_factor_x + Pwidth - 1) / cell_size;
 
-    //    // Check the cells at these positions
-    //    char top_left = level->getCell(top_y, left_x);
-    //    char top_mid = level->getCell(top_y, mid_x);
-    //    char top_right = level->getCell(top_y, right_x);
+        // Check the cells at these positions
+        char top_left = level->getCell(top_y, left_x);
+        char top_mid = level->getCell(top_y, mid_x);
+        char top_right = level->getCell(top_y, right_x);
 
-    //    // If any of these positions contains a wall, there's a collision
-    //    if (top_left == 'w' || top_mid == 'w' || top_right == 'w') {
-    //        collisionWithWallAbove = true;
+        // If any of these positions contains a wall, there's a collision
+        if (top_left == 'w' || top_mid == 'w' || top_right == 'w') {
+            collisionWithWallAbove = true;
 
-    //        // Set the player's position to be just below the ceiling
-    //        // This prevents the player from getting stuck in the ceiling
-    //        player_y = ((top_y + 1) * cell_size) - hit_box_factor_y;
-    //    }
-    //    else {
-    //        collisionWithWallAbove = false;
-    //    }
-    //}
-    //else { // Not moving upward, so no ceiling collision possible
-    //    collisionWithWallAbove = false;
-    //}
+            // Set the player's position to be just below the ceiling
+            // This prevents the player from getting stuck in the ceiling
+            player_y = ((top_y + 1) * cell_size) - hit_box_factor_y;
+        }
+        else {
+            collisionWithWallAbove = false;
+        }
+    }
+    else { // Not moving upward, so no ceiling collision possible
+        collisionWithWallAbove = false;
+    }
 }
 
 void Player::collectibleCollision(Level* level) {
@@ -192,7 +188,7 @@ void Player::collectibleCollision(Level* level) {
     char top_mid = level->getCell(top_y, mid_x);
     char top_right = level->getCell(top_y, right_x);
     // ('r' || 'h' || 'x'
-    if (((bottom_left == 'r' || bottom_mid == 'r' || bottom_right == 'r') || (right_top == 'r' || right_mid == 'r' || right_bottom == 'r') || (left_top == 'r' || left_mid == 'r' || left_bottom == 'r') || (top_left == 'r' || top_mid == 'r' || top_right == 'r')) && isActive) {
+    if (((bottom_left == 'r' || bottom_mid == 'r' || bottom_right == 'r') || (right_top == 'r' || right_mid == 'r' || right_bottom == 'r') || (left_top == 'r' || left_mid == 'r' || left_bottom == 'r') || (top_left == 'r' || top_mid == 'r' || top_right == 'r'))) {
         level->collectRing();
         if ((bottom_left == 'r' || bottom_mid == 'r' || bottom_right == 'r')) {
             level->setCell(' ', bottom_left_cell_y, bottom_left_cell_x);
@@ -217,7 +213,7 @@ void Player::collectibleCollision(Level* level) {
             level->setCell(' ',top_y, right_x);
         }
     }
-    if (((bottom_left == 'h' || bottom_mid == 'h' || bottom_right == 'h') || (right_top == 'h' || right_mid == 'h' || right_bottom == 'h') || (left_top == 'h' || left_mid == 'h' || left_bottom == 'h') || (top_left == 'h' || top_mid == 'h' || top_right == 'h')) && isActive && (health == 1 || health ==2)) {
+    if (((bottom_left == 'h' || bottom_mid == 'h' || bottom_right == 'h') || (right_top == 'h' || right_mid == 'h' || right_bottom == 'h') || (left_top == 'h' || left_mid == 'h' || left_bottom == 'h') || (top_left == 'h' || top_mid == 'h' || top_right == 'h')) && isActive) {
         health++;
         if ((bottom_left == 'h' || bottom_mid == 'h' || bottom_right == 'h')) {
             level->setCell(' ', bottom_left_cell_y, bottom_left_cell_x);

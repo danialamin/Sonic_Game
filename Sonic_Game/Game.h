@@ -15,6 +15,10 @@ private:
 	int activePlayerIndex = 0; // 0 for sonic, 1 for tails, 2 for knuckles
 	int passive1PlayerIndex = 0;
     int passive2PlayerIndex = 0; 
+	int volume;
+	int gameState; // 0 for menu, 1 for game
+	Menu menu;
+	
 public:
     Game() : window(VideoMode(screen_x, screen_y), "Sonic the Hedgehog-OOP", Style::Close), level(new Level()), camera(800, 600), volume(30), gameState(0), menu() {
         window.setVerticalSyncEnabled(true);
@@ -92,13 +96,11 @@ private:
         level->getTails()->handleInput();
         level->getTails()->checkCollisions(level);
         level->getTails()->collectibleCollision(level);
-        level->getSonic()->checkInvincibility();
         level->getTails()->applyGravity(level);
 
         level->getKnuckles()->handleInput();
         level->getKnuckles()->checkCollisions(level);
         level->getSonic()->collectibleCollision(level);
-        level->getSonic()->checkInvincibility();
         level->getKnuckles()->applyGravity(level);
 
         // put camera on the player who is active

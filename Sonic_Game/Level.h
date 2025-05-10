@@ -72,8 +72,8 @@ public:
         }
 
         // Example layout
-        //lvl[11][1] = 'w';
-        /*lvl[11][2] = 'w';
+        lvl[11][1] = 'w';
+        lvl[11][2] = 'w';
         lvl[11][3] = 'w';
         for (int i = 4; i < 200; i++) {
             if (i >= 50 && i<=55)
@@ -100,15 +100,15 @@ public:
         lvl[6][9] = 'w';
         lvl[9][5] = 'w';
 
-        lvl[9][180] = 'w';*/
+        lvl[9][180] = 'w';
 
-  //      lvl[9][6] = 'w';
-  //      lvl[9][180] = 'w';
-		//lvl[1][12] = 'w';
-  //      lvl[2][12] = 'w';
-  //      lvl[3][12] = 'w';
-  //      lvl[4][12] = 'w';
-  //      lvl[5][12] = 'w';
+        lvl[9][6] = 'w';
+        lvl[9][180] = 'w';
+		lvl[1][12] = 'w';
+        lvl[2][12] = 'w';
+        lvl[3][12] = 'w';
+        lvl[4][12] = 'w';
+        lvl[5][12] = 'w';
 
         wallTex1.loadFromFile("Data/brick1.png");
         wallSprite1.setTexture(wallTex1);

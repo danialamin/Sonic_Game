@@ -6,7 +6,6 @@ class Level; // forward declaration to avoid circulation error
 
 class Player { // abstract class
 protected:
-    string name;
     float player_x, player_y; // world positions
     float velocityY;
     float velocityX;         // Added for horizontal movement
@@ -51,10 +50,9 @@ protected:
     Texture ballTextureLeft;
     bool isColliding;
 public:
-    Player(string name, string textureRightPath, string textureLeftPath, int maxSpeedX_arg, string ballTextureRight_arg, string ballTextureLeft_arg, int activeOrPassive) { // attributes whose values are different per child, will be passed as parameter
+    Player(string textureRightPath, string textureLeftPath, int maxSpeedX_arg, string ballTextureRight_arg, string ballTextureLeft_arg, int activeOrPassive) { // attributes whose values are different per child, will be passed as parameter
 		activePlayerCoordinates = new int[4]; // [0] = x, [1] = y, [2] = direction, [3] = maxSpeedX
 
-        this->name = name;
         maxSpeedX = maxSpeedX_arg;
         velocityX = 0;
         accelerationX = 0;
@@ -168,8 +166,6 @@ public:
 		return velocityX;
 	}
 
-    int getHealth() { return health; }
-
 	bool getIsInvincible() {
 		return isInvincible;
 	}
@@ -210,6 +206,8 @@ public:
         else {
             isInvincible = false;
         }
+
+		cout << "healhth: " << health << endl;
     }
 
     // manageRun function applies acceleration, makes the player run if right/left keys are pressed

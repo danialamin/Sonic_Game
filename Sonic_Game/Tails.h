@@ -14,7 +14,7 @@ private:
 public:
 	// constructor
 	// activeOrPassive = 1 for active, 2 for passive1, 3 for passive2
-	Tails(int activeOrPassive) :Player("Tails", "Data/1right_still.png", "Data/1left_still.png", 10, "Data/1right_roll.png", "Data/1left_roll.png", activeOrPassive) {}
+	Tails(int activeOrPassive) :Player("Data/1right_still.png", "Data/1left_still.png", 10, "Data/1right_roll.png", "Data/1left_roll.png", activeOrPassive) {}
 
     void applyGravity(Level* level) override;
 
@@ -27,12 +27,12 @@ public:
             isFlying = false;
 			spaceOrUpKeyPressClock.restart();
         }
-        else if (!onGround && isActive && flyingClockTime<7 && spaceOrUpKeyPressClockTime>0.2) { // if up/space key pressed while not on ground then start flying
+        else if (!onGround && isActive && flyingClockTime < 7 && spaceOrUpKeyPressClockTime>0.2) { // if up/space key pressed while not on ground then start flying
             velocityY = -5;
             inAJump = false;
             isABall = false;
             isFlying = true;
-			spaceOrUpKeyPressClock.restart();
+            spaceOrUpKeyPressClock.restart();
         }
     }
 };
