@@ -1,6 +1,11 @@
 #pragma once
 #include <iostream>
-#include "Global_variables.h"
+#include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
+#include <SFML/Window.hpp>
+
+using namespace std;
+using namespace sf;
 #include "EnemyFactory.h"
 #include "MotoBug.h"
 

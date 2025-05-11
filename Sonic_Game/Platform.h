@@ -8,10 +8,10 @@ using namespace std;
 using namespace sf;
 #include "Obstacle.h"
 
-class Spike : public Obstacle {
+class Platform : public Obstacle {
     Sprite sprite;
 public:
-    Spike(Sprite s) { sprite = s; }
+    Platform(Sprite s) { sprite = s; }
     void draw(RenderWindow& window, float screenX, float screenY) override {
         sprite.setPosition(screenX, screenY);
         window.draw(sprite);

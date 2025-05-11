@@ -1,5 +1,11 @@
 #pragma once
-#include "Global_variables.h"
+#include <iostream>
+#include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
+#include <SFML/Window.hpp>
+
+using namespace std;
+using namespace sf;
 
 class Menu {
 private:
@@ -16,6 +22,8 @@ public:
 		backgroundS.setTexture(backgroundT);
 		arrowT.loadFromFile("Data/Arrow.png");
 		arrowS.setTexture(arrowT);
+		downKeyPressed = false;
+		upKeyPressed = false;
 	}
 	void setArrowPosition() {
 		if (menuState == 0) {

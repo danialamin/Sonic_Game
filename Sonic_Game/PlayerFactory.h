@@ -1,6 +1,11 @@
 #pragma once
 #include <iostream>
-#include "Global_variables.h"
+#include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
+#include <SFML/Window.hpp>
+
+using namespace std;
+using namespace sf;
 #include "Player.h"
 
 class PlayerFactory { // abstract class
@@ -9,7 +14,7 @@ protected:
 
 public:
 	// pure virtual function
-	virtual void createPlayer(int activeOrPassive) = 0;
+	virtual void createPlayer(int activeOrPassive, int l2, int l3) = 0;
 
 	// getters
 	Player* getPlayer() {

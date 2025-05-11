@@ -139,21 +139,34 @@
     <ClCompile Include="Tails.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BottomlessPit.h" />
     <ClInclude Include="BreakableWall.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="Collectible.h" />
+    <ClInclude Include="CollectibleFactory.h" />
     <ClInclude Include="Crawler.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Global_variables.h" />
+    <ClInclude Include="HealthPickup.h" />
+    <ClInclude Include="HealthPickupFactory.h" />
     <ClInclude Include="Knuckles.h" />
     <ClInclude Include="KnucklesFactory.h" />
     <ClInclude Include="Level.h" />
     <ClInclude Include="Level1.h" />
+    <ClInclude Include="Level2.h" />
+    <ClInclude Include="Level3.h" />
     <ClInclude Include="Obstacle.h" />
+    <ClInclude Include="Platform.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="PlayerFactory.h" />
+    <ClInclude Include="Ring.h" />
+    <ClInclude Include="RingFactory.h" />
     <ClInclude Include="Sonic.h" />
     <ClInclude Include="SonicFactory.h" />
+    <ClInclude Include="SpecialBoost.h" />
+    <ClInclude Include="SpecialBoostFactory.h" />
     <ClInclude Include="Spike.h" />
+    <ClInclude Include="String.h" />
     <ClInclude Include="Tails.h" />
     <ClInclude Include="TailsFactory.h" />
     <ClInclude Include="UnbreakableWall.h" />

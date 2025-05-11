@@ -1,12 +1,13 @@
 #pragma once
 #include <iostream>
-#include "Global_variables.h"
-#include "Enemy.h"
-#include "Player.h"
-#include "Projectile.h"
+#include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
+#include <SFML/Window.hpp>
 
 using namespace std;
 using namespace sf;
+#include "Enemy.h"
+#include "Player.h"
 
 class BeeBot : public Enemy {
 private:
@@ -170,43 +171,23 @@ public:
 
     void checkCollisionWithPlayer(Player* p) override {
         if (health>0) // if enemy is not dead
-        if (p->getX() - x > 0) { // player is to the right of the bee
-            if (p->getX() - x < 46 && (p->getY() >= y ? (false) : (y - p->getY() < 95 ? true : false))) {
+        if (p->getX() - x >= 0) { // player is to the right of the bee
+            if (p->getX() - x < 50 && (p->getY() > y ? (p->getY()-y < 30 ? true : false) : (y - p->getY() < 95 ? true : false))) {
                 if (!p->getIsABall() && !p->getIsInvincible() && p->getIsActive()) { // collision happened while player was not a ball and not invincible
                     p->takeDamage(); // player's health decreases
-                    cout << "p->health--" << endl;
                 }
                 else if (p->getIsABall()) { // collision happened while player was a ball
-                    if (p->getIsActive() && !p->getIsInvincible()) { // if active then he should not have been invincible to cause damage to enenmy
-                        health--; // enenmy's health decreases
-                        cout << "p->x " << p->getX() << endl;
-                        cout << "x " << x << endl;
-                    }
-                    else if (!p->getIsActive()) { // if passive then he can cause damage just because he is a ball
-                        health--; // enenmy's health decreases
-                        cout << "p->x " << p->getX() << endl;
-                        cout << "x " << x << endl;
-                    }
+                    health--;
                 }
             }
         }
         else {
-            if (x - p->getX() < 46 && (p->getY() >= y ? (false) : (y - p->getY() < 95 ? true : false))) {
+            if (x - p->getX() < 80 && (p->getY() > y ? (p->getY()-y<30?true:false) : (y - p->getY() < 95 ? true : false))) {
                 if (!p->getIsABall() && !p->getIsInvincible() && p->getIsActive()) { // collision happened while player was not a ball and not invincible
                     p->takeDamage(); // player's health decreases
-                    cout << "p->health--" << endl;
                 }
                 else if (p->getIsABall()) { // collision happened while player was a ball
-                    if (p->getIsActive() && !p->getIsInvincible()) { // if active then he should not have been invincible to cause damage to enenmy
-                        health--; // enenmy's health decreases
-                        cout << "p->x " << p->getX() << endl;
-                        cout << "x " << x << endl;
-                    }
-                    else if (!p->getIsActive()) { // is a ball and not active
-                        health--; // enenmy's health decreases
-                        cout << "p->x " << p->getX() << endl;
-                        cout << "x " << x << endl;
-                    }
+                    health--;
                 }
             }
         }

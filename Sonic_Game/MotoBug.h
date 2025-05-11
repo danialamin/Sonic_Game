@@ -1,7 +1,13 @@
 #pragma once
 #include <iostream>
-#include "Global_variables.h"
+#include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
+#include <SFML/Window.hpp>
+
+using namespace std;
+using namespace sf;
 #include "Enemy.h"
+
 
 class MotoBug :public Enemy {
 public:
@@ -41,15 +47,9 @@ public:
 			if (p->getX() - x < 90 && (p->getY() >= y ? (false) : (y - p->getY() < 95 ? true : false))) {
 				if (!p->getIsABall() && !p->getIsInvincible() && p->getIsActive()) { // collision happened while player was not a ball and not invincible
 					p->takeDamage(); // player's health decreases
-					cout << "p->health--" << endl;
 				}
 				else if (p->getIsABall()) { // collision happened while player was a ball
-					if (p->getIsActive() && !p->getIsInvincible()) { // if active then he should not have been invincible to cause damage to enenmy
-						health--; // enenmy's health decreases
-					}
-					else if (!p->getIsActive()) {
-						health--; // enenmy's health decreases
-					}
+					health--;
 				}
 			}
 		}
@@ -57,15 +57,9 @@ public:
 			if (x - p->getX() < 90 && (p->getY() >= y ? (false) : (y - p->getY() < 95 ? true : false))) {
 				if (!p->getIsABall() && !p->getIsInvincible() && p->getIsActive()) { // collision happened while player was not a ball and not invincible
 					p->takeDamage(); // player's health decreases
-					cout << "p->health--" << endl;
 				}
 				else if (p->getIsABall()) { // collision happened while player was a ball
-					if (p->getIsActive() && !p->getIsInvincible()) { // if active then he should not have been invincible to cause damage to enenmy
-						health--; // enenmy's health decreases
-					}
-					else if (!p->getIsActive()) { // is a ball and not active
-						health--; // enenmy's health decreases
-					}
+					health--;
 				}
 			}
 		}

@@ -1,9 +1,11 @@
     #pragma once
-    #include <iostream>
-    #include "Global_variables.h"
+#include <iostream>
+#include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
+#include <SFML/Window.hpp>
 
-    using namespace std;
-    using namespace sf;
+using namespace std;
+using namespace sf;
 
     class Projectile {
     private:
@@ -53,7 +55,7 @@
             active = true;
         }
 
-        // Update projectile position
+        // move the projectile after launch from the enemy
         void update() {
             if (active) {
                 x += speedX;
@@ -100,21 +102,19 @@
 
         // check collision of projectile with player
         void checkCollision(Player* p) {
-            if (p->getX() - x > 0) { // if player is on the right of projectile
-                if (p->getX() - x < 36 && (p->getY() >= y ? (false) : (y - p->getY() < 95 ? true : false))) {
-                    if (!p->getIsABall() && !p->getIsInvincible() && p->getIsActive()) { // collision happened while player was not a ball and not invincible
+            if (p->getX() - x >= 0) { // if player is on the right of projectile
+                if (p->getX() - x < 2 && (p->getY() > y ? (p->getY()-y<5?true:false) : (y - p->getY() < 95 ? true : false))) {
+                    if (!p->getIsInvincible() && p->getIsActive()) { // collision happened while player was not a ball and not invincible
                         p->takeDamage(); // player's health decreases
 					    this->deactivate(); // deactivate projectile    
-                        cout << "p->health--" << endl;
                     }
                 }
             }
             else { // if player is on the left of projectile
-                if (x - p->getX() < 36 && (p->getY() >= y ? (false) : (y - p->getY() < 95 ? true : false))) {
-                    if (!p->getIsABall() && !p->getIsInvincible() && p->getIsActive()) { // collision happened while player was not a ball and not invincible
+                if (x - p->getX() < 60 && (p->getY() > y ? (p->getY() - y < 5 ? true : false) : (y - p->getY() < 95 ? true : false))) {
+                    if (!p->getIsInvincible() && p->getIsActive()) { // collision happened while player was not a ball and not invincible
                         p->takeDamage(); // player's health decreases
                         this->deactivate(); // deactivate projectile    
-                        cout << "p->health--" << endl;
                     }
                 }
             }

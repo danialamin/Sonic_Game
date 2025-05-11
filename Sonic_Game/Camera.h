@@ -1,5 +1,9 @@
 #pragma once
-#include "Global_variables.h"
+#include <iostream>
+#include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
+#include <SFML/Window.hpp>
+
 using namespace std;
 using namespace sf;
 

@@ -1,5 +1,11 @@
 #pragma once
-#include "Global_variables.h"
+#include <iostream>
+#include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
+#include <SFML/Window.hpp>
+
+using namespace std;
+using namespace sf;
 #include "Camera.h"
 
 class Level; // forward declaration to avoid circulation error
@@ -49,11 +55,24 @@ protected:
     Texture ballTextureRight;
     Texture ballTextureLeft;
     bool isColliding;
+    Clock specialAbilityClock;
+    float specialAbilityClockTime;
+    bool isInvincibleFromSpecialAbility = 0; // only for knuckles
+	int l2; // if player is in level 2 
+	int l3;// if player is in level 3
 public:
-    Player(string textureRightPath, string textureLeftPath, int maxSpeedX_arg, string ballTextureRight_arg, string ballTextureLeft_arg, int activeOrPassive) { // attributes whose values are different per child, will be passed as parameter
+    Player(string textureRightPath, string textureLeftPath, int maxSpeedX_arg, string ballTextureRight_arg, string ballTextureLeft_arg, int activeOrPassive, int l2, int l3) { // attributes whose values are different per child, will be passed as parameter
 		activePlayerCoordinates = new int[4]; // [0] = x, [1] = y, [2] = direction, [3] = maxSpeedX
 
-        maxSpeedX = maxSpeedX_arg;
+		this->l2 = l2;
+		this->l3 = l3;
+
+        if (l3) { // low speed in level 3
+            maxSpeedX = maxSpeedX_arg-5;
+        }
+        else {
+            maxSpeedX = maxSpeedX_arg;
+        }
         velocityX = 0;
         accelerationX = 0;
         minSpeedX = 2.5f;
@@ -80,7 +99,12 @@ public:
 		}
         velocityY = 0;
         onGround = false;
-        gravity = 1;
+        if (l3) { // less gravity in level 3
+            gravity = 0.5;
+        }
+        else {
+            gravity = 1;
+        }
         terminal_Velocity = 20;
 
         float scale_x = 2.5, scale_y = 2.5;
@@ -103,6 +127,8 @@ public:
         jumpForce = -17.0f; // negative is up
 		isInvincible = false; 
         invincibleClockTime = 0;
+
+        specialAbilityClockTime = 15; // fake head start to avoid special ability in the start of the game
 
         health = 3;
     }
@@ -130,13 +156,17 @@ public:
 	}
 
     void takeDamage() { //when player takes damage from enemies
-        if (!isInvincible) {
+        if (!isInvincible && !isInvincibleFromSpecialAbility) {
             health--;
 			isInvincible = true; // make player invincible for 1 seconds
             invincibleClock.restart();
           
         }
     }
+
+
+    virtual void activateSpecialAbility() = 0;
+    virtual void manageSpecialAbility() = 0;
 
 	int activePlayerHealthSharing() { // this function is called in the main loop and gives the health of the active player to the passive players
         return health;
@@ -206,12 +236,11 @@ public:
         else {
             isInvincible = false;
         }
-
-		cout << "healhth: " << health << endl;
     }
 
     // manageRun function applies acceleration, makes the player run if right/left keys are pressed
     void manageRun(bool isHorizontalKeyPressed, int direction) {
+        cout << player_x << endl;
         if (collisionWithWallHorizontally) { // if player is colliding with wall then stop moving
             velocityX = 0;
             isHorizontalKeyPressed = false;
@@ -240,7 +269,13 @@ public:
             accelerationTime = runClock.getElapsedTime().asSeconds();
 
             // Calculate the current speed based on acceleration time
-            double currentSpeed = accelerationTime * accelerationTime; // currentSpeed is a quadratic curve: y=x^2
+            double currentSpeed;
+            if (l2) { // faster acceleration in level 2
+                currentSpeed = accelerationTime * accelerationTime * 0.5; // currentSpeed is a quadratic curve: y=x^2
+            }
+            else {
+                currentSpeed = accelerationTime * accelerationTime; // currentSpeed is a quadratic curve: y=x^2
+            }
 
             // Set the velocity
             if (isActive) { // if active player then maximum speed it can go is its own maxSpeedX attribute
@@ -293,7 +328,12 @@ public:
                     decelerationDirection = -1;
                 }
 
-                decelerationTimeLimit = velocityX / 4; // decelerationTimeLimit is dependent on the speed at which the player started to decelerate
+                if (l2) { // higher deceleration in level 2
+                    decelerationTimeLimit = velocityX;
+                }
+                else {
+                    decelerationTimeLimit = velocityX / 4; // decelerationTimeLimit is dependent on the speed at which the player started to decelerate
+                }
                 if (decelerationTimeLimit < 0) decelerationTimeLimit *= -1; // make it positive
             }
 
@@ -362,6 +402,7 @@ public:
     virtual void checkCollisions(Level * level);
 
     virtual void handleInput() {
+        cout << l2 << l3 << endl;
         // call jump() if up Space/Up presses
         if (Keyboard::isKeyPressed(Keyboard::Space) || Keyboard::isKeyPressed(Keyboard::Up)) {
             jump();
@@ -431,7 +472,7 @@ public:
                     player_y = activePlayerCoordinates[1] - 30;
                 }
 			}
-			else if (camera.worldToScreenX(player_x) > screen_x + 200) { // if player left behind right edge
+			else if (camera.worldToScreenX(player_x) > 1200 + 200) { // if player left behind right edge, 1200 is screen_x
                 if (isPassive1) {
                     player_x = activePlayerCoordinates[0] + 70;
                     player_y = activePlayerCoordinates[1] - 30;

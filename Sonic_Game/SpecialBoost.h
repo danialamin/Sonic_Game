@@ -6,12 +6,15 @@
 
 using namespace std;
 using namespace sf;
-#include "Obstacle.h"
+#include "Collectible.h"
 
-class Spike : public Obstacle {
-    Sprite sprite;
+using namespace std;
+using namespace sf;
+
+class SpecialBoost : public Collectible {
 public:
-    Spike(Sprite s) { sprite = s; }
+    SpecialBoost(Sprite sprite) : Collectible(sprite) {}
+
     void draw(RenderWindow& window, float screenX, float screenY) override {
         sprite.setPosition(screenX, screenY);
         window.draw(sprite);
